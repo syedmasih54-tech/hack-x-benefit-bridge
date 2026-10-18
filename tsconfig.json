@@ -8,7 +8,6 @@
     "skipLibCheck": true,
     "moduleResolution": "bundler",
     "moduleDetection": "force",
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
