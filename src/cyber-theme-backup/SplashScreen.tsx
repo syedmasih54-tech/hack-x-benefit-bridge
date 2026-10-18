@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"
 
 interface SplashScreenProps {
-  onComplete: () => void;
+  onComplete: () => void
 }
 
 export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
@@ -9,50 +9,52 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
   // Phase 2: 0.8s - 1.8s (Identity Stagger Reveal)
   // Phase 3: 1.8s - 2.6s (System Verification Scan)
   // Phase 4: 2.6s - 3.2s (Smooth Cinematic Exit)
-  const [phase, setPhase] = useState<number>(1);
-  const [isExiting, setIsExiting] = useState<boolean>(false);
-  const [dpiReady, setDpiReady] = useState<boolean>(false);
+  const [phase, setPhase] = useState<number>(1)
+  const [isExiting, setIsExiting] = useState<boolean>(false)
+  const [dpiReady, setDpiReady] = useState<boolean>(false)
 
   useEffect(() => {
     // Phase 2 starts at 800ms
     const tPhase2 = setTimeout(() => {
-      setPhase(2);
-    }, 800);
+      setPhase(2)
+    }, 800)
 
     // Phase 3 starts at 1800ms
     const tPhase3 = setTimeout(() => {
-      setPhase(3);
-    }, 1800);
+      setPhase(3)
+    }, 1800)
 
     // DPI ready tick at 2200ms
     const tDpiReady = setTimeout(() => {
-      setDpiReady(true);
-    }, 2200);
+      setDpiReady(true)
+    }, 2200)
 
     // Phase 4 starts at 2600ms (scale-105, opacity-0)
     const tPhase4 = setTimeout(() => {
-      setPhase(4);
-      setIsExiting(true);
-    }, 2600);
+      setPhase(4)
+      setIsExiting(true)
+    }, 2600)
 
     // Completion at 3200ms
     const tComplete = setTimeout(() => {
-      onComplete();
-    }, 3200);
+      onComplete()
+    }, 3200)
 
     return () => {
-      clearTimeout(tPhase2);
-      clearTimeout(tPhase3);
-      clearTimeout(tDpiReady);
-      clearTimeout(tPhase4);
-      clearTimeout(tComplete);
-    };
-  }, [onComplete]);
+      clearTimeout(tPhase2)
+      clearTimeout(tPhase3)
+      clearTimeout(tDpiReady)
+      clearTimeout(tPhase4)
+      clearTimeout(tComplete)
+    }
+  }, [onComplete])
 
   return (
     <div
       className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0B0F19] cyber-grid overflow-hidden transition-all duration-700 ease-in-out ${
-        isExiting ? "scale-105 opacity-0 pointer-events-none" : "scale-100 opacity-100"
+        isExiting
+          ? "scale-105 opacity-0 pointer-events-none"
+          : "scale-100 opacity-100"
       }`}
       aria-label="BenefitBridge Cinematic Startup"
     >
@@ -66,7 +68,6 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
 
       {/* Center Cinematic Container */}
       <div className="relative z-10 flex flex-col items-center justify-center max-w-xl w-full px-6 text-center space-y-6">
-        
         {/* Phase 1 & 2: Center Shield / Emblem with Radial Glow & Expanding Ripple */}
         <div className="relative flex items-center justify-center">
           {/* Expanding Luminous Ripple (Phase 2+) */}
@@ -87,7 +88,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
           {/* Central Shield Emblem */}
           <div
             className={`w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-[#161F30] via-[#111827] to-[#0B0F19] border border-[#1F2937] shadow-2xl flex items-center justify-center relative z-10 transition-all duration-700 ${
-              phase >= 2 ? "scale-110 shadow-blue-500/25 border-blue-500/50" : "scale-100"
+              phase >= 2
+                ? "scale-110 shadow-blue-500/25 border-blue-500/50"
+                : "scale-100"
             }`}
           >
             {/* Luminous Core Glow */}
@@ -104,7 +107,11 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
               strokeLinejoin="round"
             >
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              <path d="M7 11c1.5 3 8.5 3 10 0" stroke="#FB923C" strokeWidth="2" />
+              <path
+                d="M7 11c1.5 3 8.5 3 10 0"
+                stroke="#FB923C"
+                strokeWidth="2"
+              />
               <circle cx="12" cy="8" r="1.5" fill="#10B981" stroke="#10B981" />
             </svg>
           </div>
@@ -125,7 +132,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
           <p className="text-xs sm:text-sm font-semibold tracking-wide text-slate-400 flex items-center justify-center gap-2">
             <span className="text-slate-300">Citizen Welfare Navigator</span>
             <span className="text-[#FB923C]">•</span>
-            <span className="text-[#FB923C] font-hindi">सेतु नागरिक सशक्तिकरण</span>
+            <span className="text-[#FB923C] font-hindi">
+              सेतु नागरिक सशक्तिकरण
+            </span>
           </p>
         </div>
 
@@ -143,8 +152,12 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
 
             {/* DPI Connection Text */}
             <div className="text-[11px] font-mono text-slate-400 text-left flex items-center justify-between">
-              <span className="truncate">Connecting to Digital Public Infrastructure...</span>
-              <span className="text-cyan-400 font-bold shrink-0 ml-2">[DPI v2.0]</span>
+              <span className="truncate">
+                Connecting to Digital Public Infrastructure...
+              </span>
+              <span className="text-cyan-400 font-bold shrink-0 ml-2">
+                [DPI v2.0]
+              </span>
             </div>
 
             {/* Sub-Badges: DigiLocker | API Setu | Citizen Charter */}
@@ -196,7 +209,6 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
         <span>MeitY • API Setu Partner Verified • Citizen Charter 2026</span>
       </div>
     </div>
-  );
-};
-export default SplashScreen;
-
+  )
+}
+export default SplashScreen

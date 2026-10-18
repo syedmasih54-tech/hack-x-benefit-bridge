@@ -1,62 +1,62 @@
-import React, { useState, useEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Lenis from "lenis";
-import Section1Intro from "./components/Section1Intro";
-import Section2Statement from "./components/Section2Statement";
-import Section3Focus from "./components/Section3Focus";
-import Section4JourneyTickets from "./components/Section4JourneyTickets";
-import Section5WhoDecides from "./components/Section5WhoDecides";
-import Section6Closing from "./components/Section6Closing";
-import { getPortalUrl, getDigiLockerUrl } from "./lib/urls";
+import React, { useState, useEffect, useRef } from "react"
+import gsap from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+import Lenis from "lenis"
+import Section1Intro from "./components/Section1Intro"
+import Section2Statement from "./components/Section2Statement"
+import Section3Focus from "./components/Section3Focus"
+import Section4JourneyTickets from "./components/Section4JourneyTickets"
+import Section5WhoDecides from "./components/Section5WhoDecides"
+import Section6Closing from "./components/Section6Closing"
+import { getPortalUrl, getDigiLockerUrl } from "./lib/urls"
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger)
 
-export type Language = "en" | "hi";
+export type Language = "en" | "hi"
 
 interface TranslationDictionary {
   nav: {
-    brand: string;
-    taglineDesktop: string;
-    taglineMobile: string;
-    liveGatewayBadge: string;
-    livePortalBtn: string;
-  };
+    brand: string
+    taglineDesktop: string
+    taglineMobile: string
+    liveGatewayBadge: string
+    livePortalBtn: string
+  }
   civicGateway: {
-    badge: string;
-    title: string;
-    subtitle: string;
-    card1Title: string;
-    card1Desc: string;
-    card1Btn: string;
-    card2Title: string;
-    card2Desc: string;
-    card2Btn: string;
-    card3Title: string;
-    card3Desc: string;
-    card3Btn: string;
-    slaPrefix: string;
-    slaStrong: string;
-    slaEscalation: string;
-    statusSummary: string;
-    replayIntro: string;
-  };
+    badge: string
+    title: string
+    subtitle: string
+    card1Title: string
+    card1Desc: string
+    card1Btn: string
+    card2Title: string
+    card2Desc: string
+    card2Btn: string
+    card3Title: string
+    card3Desc: string
+    card3Btn: string
+    slaPrefix: string
+    slaStrong: string
+    slaEscalation: string
+    statusSummary: string
+    replayIntro: string
+  }
   modals: {
-    voiceTitle: string;
-    voiceSubtitle: string;
-    voiceRecordingPrompt: string;
-    voiceSamplePrompt: string;
-    voiceCancelBtn: string;
-    voiceStopBtn: string;
-    scannerTitle: string;
-    scannerSubtitle: string;
-    scannerCard1Title: string;
-    scannerCard2Title: string;
-    scannerMismatch: string;
-    scannerAdvice: string;
-    scannerCloseBtn: string;
-    scannerLaunchBtn: string;
-  };
+    voiceTitle: string
+    voiceSubtitle: string
+    voiceRecordingPrompt: string
+    voiceSamplePrompt: string
+    voiceCancelBtn: string
+    voiceStopBtn: string
+    scannerTitle: string
+    scannerSubtitle: string
+    scannerCard1Title: string
+    scannerCard2Title: string
+    scannerMismatch: string
+    scannerAdvice: string
+    scannerCloseBtn: string
+    scannerLaunchBtn: string
+  }
 }
 
 const TRANSLATIONS: Record<Language, TranslationDictionary> = {
@@ -87,22 +87,28 @@ const TRANSLATIONS: Record<Language, TranslationDictionary> = {
       card3Btn: "Check Discrepancies",
       slaPrefix: "State Right to Public Services Act:",
       slaStrong: "30-Day Mandatory Statutory SLA",
-      slaEscalation: "Automatic CPGRAMS escalation triggered if government deadlines lapse",
+      slaEscalation:
+        "Automatic CPGRAMS escalation triggered if government deadlines lapse",
       statusSummary: "All 6 Landing Page Sections Deployed & Active",
       replayIntro: "Replay Intro Sequence ↻",
     },
     modals: {
       voiceTitle: "Voice Application Assistant",
-      voiceSubtitle: "Speak in Hindi, English, Bhojpuri, or Bengali to fill your welfare application automatically.",
-      voiceRecordingPrompt: "Listening... speak your name, age, and desired scheme clearly.",
-      voiceSamplePrompt: 'Example: "My age is 62 years and annual household income is ₹75,000. Check eligibility for Old Age Pension."',
+      voiceSubtitle:
+        "Speak in Hindi, English, Bhojpuri, or Bengali to fill your welfare application automatically.",
+      voiceRecordingPrompt:
+        "Listening... speak your name, age, and desired scheme clearly.",
+      voiceSamplePrompt:
+        'Example: "My age is 62 years and annual household income is ₹75,000. Check eligibility for Old Age Pension."',
       voiceCancelBtn: "Cancel",
       voiceStopBtn: "Stop & Transcribe",
       scannerTitle: "Document Doctor • Discrepancy Analyzer",
-      scannerSubtitle: "Comparing Aadhaar card name string against Ration card database records.",
+      scannerSubtitle:
+        "Comparing Aadhaar card name string against Ration card database records.",
       scannerCard1Title: "Aadhaar Card Record:",
       scannerCard2Title: "Ration Card Database:",
-      scannerMismatch: "Phonetic soundex variation detected: Match confidence 98.4%",
+      scannerMismatch:
+        "Phonetic soundex variation detected: Match confidence 98.4%",
       scannerAdvice:
         "The system has generated a pre-formatted Annexure-I name variation affidavit using the Official Gazette transliteration matrix. No rejection permitted under UIDAI Circular 2024.",
       scannerCloseBtn: "Done",
@@ -142,62 +148,69 @@ const TRANSLATIONS: Record<Language, TranslationDictionary> = {
     },
     modals: {
       voiceTitle: "आवाज़ आधारित आवेदन सहायक",
-      voiceSubtitle: "हिंदी, अंग्रेज़ी, भोजपुरी या बंगाली में बोलकर अपना सरकारी आवेदन फॉर्म स्वतः भरें।",
-      voiceRecordingPrompt: "सुन रहे हैं... कृपया अपना नाम, आयु और योजना स्पष्ट रूप से बोलें।",
-      voiceSamplePrompt: 'उदाहरण: "मेरी उम्र 62 वर्ष है, वार्षिक पारिवारिक आय ₹75,000 है, वृद्धावस्था पेंशन के लिए पात्रता जांचें"',
+      voiceSubtitle:
+        "हिंदी, अंग्रेज़ी, भोजपुरी या बंगाली में बोलकर अपना सरकारी आवेदन फॉर्म स्वतः भरें।",
+      voiceRecordingPrompt:
+        "सुन रहे हैं... कृपया अपना नाम, आयु और योजना स्पष्ट रूप से बोलें।",
+      voiceSamplePrompt:
+        'उदाहरण: "मेरी उम्र 62 वर्ष है, वार्षिक पारिवारिक आय ₹75,000 है, वृद्धावस्था पेंशन के लिए पात्रता जांचें"',
       voiceCancelBtn: "रद्द करें",
       voiceStopBtn: "रोकें और दर्ज करें",
       scannerTitle: "दस्तावेज़ डॉक्टर • वर्तनी विसंगति विश्लेषक",
-      scannerSubtitle: "आधार कार्ड नाम का राशन कार्ड डेटाबेस रिकॉर्ड से मिलान किया जा रहा है।",
+      scannerSubtitle:
+        "आधार कार्ड नाम का राशन कार्ड डेटाबेस रिकॉर्ड से मिलान किया जा रहा है।",
       scannerCard1Title: "आधार कार्ड रिकॉर्ड:",
       scannerCard2Title: "राशन कार्ड डेटाबेस:",
-      scannerMismatch: "ध्वन्यात्मक साउंडेक्स वर्तनी भिन्नता मिली: मिलान विश्वसनीयता 98.4%",
+      scannerMismatch:
+        "ध्वन्यात्मक साउंडेक्स वर्तनी भिन्नता मिली: मिलान विश्वसनीयता 98.4%",
       scannerAdvice:
         "प्रणाली ने आधिकारिक राजपत्र के आधार पर स्वतः शपथ-पत्र प्रारूप तैयार कर लिया है। यूआईडीएआई परिपत्र 2024 के अनुसार इसे निरस्त नहीं किया जा सकता।",
       scannerCloseBtn: "संपन्न",
       scannerLaunchBtn: "मुख्य पोर्टल खोलें ↗",
     },
   },
-};
+}
 
 export default function App() {
-  const [isIntroActive, setIsIntroActive] = useState<boolean>(true);
+  const [isIntroActive, setIsIntroActive] = useState<boolean>(true)
   const [selectedLanguage, setSelectedLanguage] = useState<Language>(() => {
     if (typeof window !== "undefined") {
       try {
-        const saved = localStorage.getItem("benefitbridge_lang");
-        if (saved === "hi" || saved === "en") return saved;
+        const saved = localStorage.getItem("benefitbridge_lang")
+        if (saved === "hi" || saved === "en") return saved
       } catch {
         // Fallback for restricted iframes
       }
     }
-    return "en";
-  });
+    return "en"
+  })
 
-  const [activeModal, setActiveModal] = useState<"none" | "voice" | "scanner">("none");
+  const [activeModal, setActiveModal] = useState<"none" | "voice" | "scanner">(
+    "none",
+  )
 
-  const underneathWordmarkRef = useRef<HTMLDivElement | null>(null);
-  const lenisRef = useRef<Lenis | null>(null);
+  const underneathWordmarkRef = useRef<HTMLDivElement | null>(null)
+  const lenisRef = useRef<Lenis | null>(null)
 
-  const t = TRANSLATIONS[selectedLanguage];
+  const t = TRANSLATIONS[selectedLanguage]
 
   const handleLanguageChange = (lang: Language) => {
-    setSelectedLanguage(lang);
+    setSelectedLanguage(lang)
     if (typeof window !== "undefined") {
       try {
-        localStorage.setItem("benefitbridge_lang", lang);
+        localStorage.setItem("benefitbridge_lang", lang)
       } catch {
         // Fallback
       }
-      document.documentElement.lang = lang;
+      document.documentElement.lang = lang
     }
-  };
+  }
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      document.documentElement.lang = selectedLanguage;
+      document.documentElement.lang = selectedLanguage
     }
-  }, [selectedLanguage]);
+  }, [selectedLanguage])
 
   // Initialize Lenis smooth scroll and sync with ScrollTrigger
   useEffect(() => {
@@ -205,36 +218,36 @@ export default function App() {
       duration: 1.1,
       easing: (v: number) => Math.min(1, 1.001 - Math.pow(2, -10 * v)),
       smoothWheel: true,
-    });
-    lenisRef.current = lenis;
+    })
+    lenisRef.current = lenis
 
-    lenis.on("scroll", ScrollTrigger.update);
+    lenis.on("scroll", ScrollTrigger.update)
 
     const updateTicker = (time: number) => {
-      lenis.raf(time * 1000);
-    };
+      lenis.raf(time * 1000)
+    }
 
-    gsap.ticker.add(updateTicker);
-    gsap.ticker.lagSmoothing(0);
+    gsap.ticker.add(updateTicker)
+    gsap.ticker.lagSmoothing(0)
 
     return () => {
-      gsap.ticker.remove(updateTicker);
-      lenis.destroy();
-      lenisRef.current = null;
-    };
-  }, []);
+      gsap.ticker.remove(updateTicker)
+      lenis.destroy()
+      lenisRef.current = null
+    }
+  }, [])
 
   // Lock scroll while Section 1 intro is running
   useEffect(() => {
     if (isIntroActive) {
-      lenisRef.current?.stop();
-      document.body.style.overflow = "hidden";
+      lenisRef.current?.stop()
+      document.body.style.overflow = "hidden"
     } else {
-      lenisRef.current?.start();
-      document.body.style.overflow = "";
-      ScrollTrigger.refresh();
+      lenisRef.current?.start()
+      document.body.style.overflow = ""
+      ScrollTrigger.refresh()
     }
-  }, [isIntroActive]);
+  }, [isIntroActive])
 
   return (
     <div className="min-h-screen bg-[#FFFDF9] text-[#1A0F12] font-body selection:bg-[#C41528] selection:text-white relative overflow-x-hidden">
@@ -349,7 +362,11 @@ export default function App() {
             <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-red-100/50 blur-2xl pointer-events-none group-hover:scale-125 transition-transform" />
             <div className="relative z-10">
               <div className="w-12 h-12 rounded-2xl bg-white/90 border border-[#1A0F12]/10 flex items-center justify-center text-[#C41528] mb-5 group-hover:border-[#C41528]/40 transition-colors shadow-xs">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="w-6 h-6"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
                 </svg>
               </div>
@@ -374,8 +391,18 @@ export default function App() {
             <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-amber-100/50 blur-2xl pointer-events-none group-hover:scale-125 transition-transform" />
             <div className="relative z-10">
               <div className="w-12 h-12 rounded-2xl bg-white/90 border border-[#1A0F12]/10 flex items-center justify-center text-[#8E1B2B] mb-5 group-hover:border-[#C41528]/40 transition-colors shadow-xs">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+                  />
                 </svg>
               </div>
               <h4 className="text-lg font-bold text-[#1A0F12] mb-2 tracking-tight">
@@ -400,8 +427,18 @@ export default function App() {
             <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-rose-100/50 blur-2xl pointer-events-none group-hover:scale-125 transition-transform" />
             <div className="relative z-10">
               <div className="w-12 h-12 rounded-2xl bg-white/90 border border-[#1A0F12]/10 flex items-center justify-center text-[#1A0F12] mb-5 group-hover:border-[#C41528]/40 transition-colors shadow-xs">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
               </div>
               <h4 className="text-lg font-bold text-[#1A0F12] mb-2 tracking-tight">
@@ -444,8 +481,8 @@ export default function App() {
           <button
             type="button"
             onClick={() => {
-              sessionStorage.removeItem("bb_intro_seen");
-              setIsIntroActive(true);
+              sessionStorage.removeItem("bb_intro_seen")
+              setIsIntroActive(true)
             }}
             className="text-[#C41528] hover:underline cursor-pointer font-medium"
           >
@@ -578,5 +615,5 @@ export default function App() {
         </div>
       )}
     </div>
-  );
+  )
 }

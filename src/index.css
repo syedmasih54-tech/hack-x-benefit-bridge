@@ -43,6 +43,13 @@
 .text-deep-red {
   color: var(--color-deep-red);
 }
+.backdrop-blur-xs {
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+.shadow-xs {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
 
 html.lenis, html.lenis body {
   height: auto;

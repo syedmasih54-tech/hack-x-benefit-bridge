@@ -1,52 +1,48 @@
-import React, { useEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import React, { useEffect, useRef } from "react"
+import gsap from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger)
 
 export const Section5WhoDecides: React.FC = () => {
-  const sectionRef = useRef<HTMLElement | null>(null);
-  const linesContainerRef = useRef<HTMLDivElement | null>(null);
+  const sectionRef = useRef<HTMLElement | null>(null)
+  const linesContainerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const prefersReducedMotion =
       typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
     const lineElements =
-      linesContainerRef.current?.querySelectorAll(".who-line");
+      linesContainerRef.current?.querySelectorAll(".who-line")
 
     if (prefersReducedMotion) {
       if (lineElements) {
-        gsap.set(lineElements, { yPercent: 0, opacity: 1 });
+        gsap.set(lineElements, { yPercent: 0, opacity: 1 })
       }
-      return;
+      return
     }
 
     const ctx = gsap.context(() => {
       if (lineElements && lineElements.length > 0) {
-        gsap.fromTo(
-          lineElements,
-          { yPercent: 110 },
-          {
-            yPercent: 0,
-            stagger: 0.12,
-            duration: 0.95,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: linesContainerRef.current,
-              start: "top 80%",
-              toggleActions: "play none none none",
-            },
-          }
-        );
+        gsap.fromTo(lineElements, { yPercent: 110 }, {
+          yPercent: 0,
+          stagger: 0.12,
+          duration: 0.95,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: linesContainerRef.current,
+            start: "top 80%",
+            toggleActions: "play none none none",
+          },
+        })
       }
-    }, sectionRef);
+    }, sectionRef)
 
     return () => {
-      ctx.revert();
-    };
-  }, []);
+      ctx.revert()
+    }
+  }, [])
 
   return (
     <section
@@ -101,8 +97,7 @@ export const Section5WhoDecides: React.FC = () => {
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default Section5WhoDecides;
-
+export default Section5WhoDecides

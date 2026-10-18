@@ -1,0 +1,12 @@
+{
+  "include": [
+    "backend",
+    "api"
+  ],
+  "extraPaths": [
+    "backend"
+  ],
+  "reportMissingImports": "none",
+  "pythonVersion": "3.11"
+}
+

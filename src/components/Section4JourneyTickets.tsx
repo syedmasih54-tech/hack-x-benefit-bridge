@@ -1,27 +1,27 @@
-import React, { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { getPortalUrl } from "../lib/urls";
+import React, { useEffect, useRef, useState } from "react"
+import gsap from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { getPortalUrl } from "../lib/urls"
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger)
 
 // Seeded bar widths for stable, deterministic barcode rendering
 const BARCODE_SEEDS = [
   [2, 1, 3, 1, 2, 4, 1, 2, 3, 1, 1, 4, 2, 1, 3, 2, 1, 4, 1, 2, 3],
   [3, 1, 2, 4, 1, 1, 3, 2, 1, 4, 2, 1, 2, 3, 1, 4, 1, 2, 1, 3, 2],
   [1, 4, 2, 1, 3, 2, 1, 3, 4, 1, 2, 1, 4, 2, 3, 1, 1, 2, 4, 1, 2],
-];
+]
 
 interface BarcodeProps {
-  seed: number[];
-  isFlickering: boolean;
+  seed: number[]
+  isFlickering: boolean
 }
 
 const Barcode: React.FC<BarcodeProps> = ({ seed, isFlickering }) => {
-  let currentX = 2;
+  let currentX = 2
   const rects = seed.map((width, idx) => {
-    const x = currentX;
-    currentX += width * 2.1 + 1.8;
+    const x = currentX
+    currentX += width * 2.1 + 1.8
     return (
       <rect
         key={idx}
@@ -31,8 +31,8 @@ const Barcode: React.FC<BarcodeProps> = ({ seed, isFlickering }) => {
         height="22"
         fill="#C41528"
       />
-    );
-  });
+    )
+  })
 
   return (
     <svg
@@ -45,30 +45,30 @@ const Barcode: React.FC<BarcodeProps> = ({ seed, isFlickering }) => {
     >
       {rects}
     </svg>
-  );
-};
+  )
+}
 
 export const Section4JourneyTickets: React.FC = () => {
-  const sectionRef = useRef<HTMLElement | null>(null);
-  const pinContainerRef = useRef<HTMLDivElement | null>(null);
-  const cardsWrapRef = useRef<HTMLDivElement | null>(null);
+  const sectionRef = useRef<HTMLElement | null>(null)
+  const pinContainerRef = useRef<HTMLDivElement | null>(null)
+  const cardsWrapRef = useRef<HTMLDivElement | null>(null)
 
-  const card1Ref = useRef<HTMLDivElement | null>(null);
-  const card2Ref = useRef<HTMLDivElement | null>(null);
-  const card3Ref = useRef<HTMLDivElement | null>(null);
+  const card1Ref = useRef<HTMLDivElement | null>(null)
+  const card2Ref = useRef<HTMLDivElement | null>(null)
+  const card3Ref = useRef<HTMLDivElement | null>(null)
 
-  const [flickeringCard, setFlickeringCard] = useState<number | null>(null);
-  const [isThirdStubTorn, setIsThirdStubTorn] = useState<boolean>(false);
+  const [flickeringCard, setFlickeringCard] = useState<number | null>(null)
+  const [isThirdStubTorn, setIsThirdStubTorn] = useState<boolean>(false)
 
   // Hover 3D cursor tilt (desktop only)
   const handleCardMouseMove = (
     e: React.MouseEvent<HTMLDivElement>,
-    cardEl: HTMLDivElement | null
+    cardEl: HTMLDivElement | null,
   ) => {
-    if (!cardEl || window.innerWidth < 768) return;
-    const rect = cardEl.getBoundingClientRect();
-    const relX = (e.clientX - rect.left) / rect.width - 0.5;
-    const relY = (e.clientY - rect.top) / rect.height - 0.5;
+    if (!cardEl || window.innerWidth < 768) return
+    const rect = cardEl.getBoundingClientRect()
+    const relX = (e.clientX - rect.left) / rect.width - 0.5
+    const relY = (e.clientY - rect.top) / rect.height - 0.5
 
     gsap.to(cardEl, {
       rotateY: relX * 12, // -6deg to +6deg
@@ -76,31 +76,31 @@ export const Section4JourneyTickets: React.FC = () => {
       duration: 0.25,
       ease: "power2.out",
       overwrite: "auto",
-    });
-  };
+    })
+  }
 
   const handleCardMouseLeave = (cardEl: HTMLDivElement | null) => {
-    if (!cardEl || window.innerWidth < 768) return;
+    if (!cardEl || window.innerWidth < 768) return
     gsap.to(cardEl, {
       rotateY: 0,
       rotateX: 0,
       duration: 0.45,
       ease: "power2.out",
       overwrite: "auto",
-    });
-  };
+    })
+  }
 
   const triggerFlicker = (cardIdx: number) => {
-    setFlickeringCard(cardIdx);
+    setFlickeringCard(cardIdx)
     setTimeout(() => {
-      setFlickeringCard(null);
-    }, 220);
-  };
+      setFlickeringCard(null)
+    }, 220)
+  }
 
   useEffect(() => {
     const prefersReducedMotion =
       typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
     if (prefersReducedMotion) {
       if (card1Ref.current && card2Ref.current && card3Ref.current) {
@@ -112,36 +112,32 @@ export const Section4JourneyTickets: React.FC = () => {
           rotateZ: 0,
           scale: 1,
           opacity: 1,
-        });
+        })
       }
-      return;
+      return
     }
 
     const ctx = gsap.context(() => {
-      const isMobile = window.innerWidth < 768;
+      const isMobile = window.innerWidth < 768
 
       if (isMobile) {
         // Mobile stack animation without 3D tilt
-        const cards = [card1Ref.current, card2Ref.current, card3Ref.current];
+        const cards = [card1Ref.current, card2Ref.current, card3Ref.current]
         cards.forEach((card) => {
-          if (!card) return;
-          gsap.fromTo(
-            card,
-            { y: 80, opacity: 0 },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.8,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: card,
-                start: "top 85%",
-                toggleActions: "play none none none",
-              },
-            }
-          );
-        });
-        return;
+          if (!card) return
+          gsap.fromTo(card, { y: 80, opacity: 0 }, {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: card,
+              start: "top 85%",
+              toggleActions: "play none none none",
+            },
+          })
+        })
+        return
       }
 
       // Desktop: Pinned 250vh with 3D flying entry
@@ -154,7 +150,7 @@ export const Section4JourneyTickets: React.FC = () => {
           scrub: 1.2,
           anticipatePin: 1,
         },
-      });
+      })
 
       // Start positions from specification:
       gsap.set(card1Ref.current, {
@@ -165,7 +161,7 @@ export const Section4JourneyTickets: React.FC = () => {
         rotateZ: -12,
         scale: 0.8,
         transformOrigin: "center center",
-      });
+      })
 
       gsap.set(card2Ref.current, {
         y: "120vh",
@@ -175,7 +171,7 @@ export const Section4JourneyTickets: React.FC = () => {
         rotateZ: 6,
         scale: 0.8,
         transformOrigin: "center center",
-      });
+      })
 
       gsap.set(card3Ref.current, {
         y: "120vh",
@@ -185,7 +181,7 @@ export const Section4JourneyTickets: React.FC = () => {
         rotateZ: 12,
         scale: 0.8,
         transformOrigin: "center center",
-      });
+      })
 
       // Fly into row with power3.out, stagger 0.15, scrubbed to scroll
       tl.to(
@@ -200,8 +196,8 @@ export const Section4JourneyTickets: React.FC = () => {
           ease: "power3.out",
           duration: 0.75,
         },
-        0
-      );
+        0,
+      )
 
       tl.to(
         card2Ref.current,
@@ -215,8 +211,8 @@ export const Section4JourneyTickets: React.FC = () => {
           ease: "power3.out",
           duration: 0.75,
         },
-        0.15
-      );
+        0.15,
+      )
 
       tl.to(
         card3Ref.current,
@@ -230,8 +226,8 @@ export const Section4JourneyTickets: React.FC = () => {
           ease: "power3.out",
           duration: 0.75,
         },
-        0.3
-      );
+        0.3,
+      )
 
       // Overshoot tilt on the third ticket at the end
       tl.to(
@@ -242,8 +238,8 @@ export const Section4JourneyTickets: React.FC = () => {
           duration: 0.2,
           ease: "power2.out",
         },
-        0.85
-      );
+        0.85,
+      )
 
       tl.to(
         card3Ref.current,
@@ -253,14 +249,14 @@ export const Section4JourneyTickets: React.FC = () => {
           duration: 0.15,
           ease: "power2.inOut",
         },
-        1.05
-      );
-    }, sectionRef);
+        1.05,
+      )
+    }, sectionRef)
 
     return () => {
-      ctx.revert();
-    };
-  }, []);
+      ctx.revert()
+    }
+  }, [])
 
   return (
     <section
@@ -318,7 +314,8 @@ export const Section4JourneyTickets: React.FC = () => {
                     Eligibility
                   </h3>
                   <p className="text-xs text-[#1A0F12]/75 font-light leading-relaxed mt-2.5 mb-6">
-                    Fixed, source-linked rules tell Sunita if she may qualify, and show why.
+                    Fixed, source-linked rules tell Sunita if she may qualify,
+                    and show why.
                   </p>
                 </div>
 
@@ -340,7 +337,7 @@ export const Section4JourneyTickets: React.FC = () => {
                     <span className="text-[#C41528] font-bold text-sm leading-none mt-0.5">
                       →
                     </span>
-                    <span>Never says "approved"</span>
+                    <span>Never says &quot;approved&quot;</span>
                   </li>
                 </ul>
               </div>
@@ -357,7 +354,10 @@ export const Section4JourneyTickets: React.FC = () => {
                 <span className="text-[10px] font-mono text-[#8E1B2B] uppercase tracking-wider block font-semibold">
                   Next step: check eligibility
                 </span>
-                <Barcode seed={BARCODE_SEEDS[0]} isFlickering={flickeringCard === 0} />
+                <Barcode
+                  seed={BARCODE_SEEDS[0]}
+                  isFlickering={flickeringCard === 0}
+                />
                 <p className="text-[9px] font-sans text-[#1A0F12]/60 tracking-tight pt-1">
                   Rules decide. AI only explains.
                 </p>
@@ -383,7 +383,8 @@ export const Section4JourneyTickets: React.FC = () => {
                     Document Doctor
                   </h3>
                   <p className="text-xs text-[#1A0F12]/75 font-light leading-relaxed mt-2.5 mb-6">
-                    Reads the name on her documents and flags possible mismatches.
+                    Reads the name on her documents and flags possible
+                    mismatches.
                   </p>
                 </div>
 
@@ -422,7 +423,10 @@ export const Section4JourneyTickets: React.FC = () => {
                 <span className="text-[10px] font-mono text-[#8E1B2B] uppercase tracking-wider block font-semibold">
                   Next step: fix the name
                 </span>
-                <Barcode seed={BARCODE_SEEDS[1]} isFlickering={flickeringCard === 1} />
+                <Barcode
+                  seed={BARCODE_SEEDS[1]}
+                  isFlickering={flickeringCard === 1}
+                />
                 <p className="text-[9px] font-sans text-[#1A0F12]/60 tracking-tight pt-1">
                   Rules decide. AI only explains.
                 </p>
@@ -448,7 +452,8 @@ export const Section4JourneyTickets: React.FC = () => {
                     Complaint
                   </h3>
                   <p className="text-xs text-[#1A0F12]/75 font-light leading-relaxed mt-2.5 mb-6">
-                    A Hindi draft from verified facts, filed by her, never automatically.
+                    A Hindi draft from verified facts, filed by her, never
+                    automatically.
                   </p>
                 </div>
 
@@ -501,7 +506,10 @@ export const Section4JourneyTickets: React.FC = () => {
                   </span>
                 </div>
 
-                <Barcode seed={BARCODE_SEEDS[2]} isFlickering={flickeringCard === 2} />
+                <Barcode
+                  seed={BARCODE_SEEDS[2]}
+                  isFlickering={flickeringCard === 2}
+                />
 
                 {/* Exposed Red Demo Button when stub tears off */}
                 {isThirdStubTorn ? (
@@ -509,7 +517,7 @@ export const Section4JourneyTickets: React.FC = () => {
                     <a
                       href={getPortalUrl()}
                       onClick={(e) => e.stopPropagation()}
-                      className="min-h-[44px] w-full px-4 py-2.5 rounded-xl bg-[#C41528] hover:bg-[#8E1B2B] text-white text-xs font-bold transition-all shadow-md inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-98"
+                      className="min-h-[44px] w-full px-4 py-2.5 rounded-xl bg-[#C41528] hover:bg-[#8E1B2B] text-white text-xs font-bold transition-all shadow-md inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98]"
                     >
                       <span>Try the demo</span>
                       <span aria-hidden="true">→</span>
@@ -533,7 +541,7 @@ export const Section4JourneyTickets: React.FC = () => {
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default Section4JourneyTickets;
+export default Section4JourneyTickets

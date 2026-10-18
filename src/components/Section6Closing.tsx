@@ -1,5 +1,5 @@
-import React from "react";
-import { getPortalUrl } from "../lib/urls";
+import React from "react"
+import { getPortalUrl } from "../lib/urls"
 
 export const Section6Closing: React.FC = () => {
   return (
@@ -78,8 +78,7 @@ export const Section6Closing: React.FC = () => {
         </div>
       </div>
     </footer>
-  );
-};
+  )
+}
 
-export default Section6Closing;
-
+export default Section6Closing

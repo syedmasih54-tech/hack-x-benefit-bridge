@@ -1,15 +1,15 @@
-import React, { useEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import React, { useEffect, useRef } from "react"
+import gsap from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger)
 
 export const Section3Focus: React.FC = () => {
-  const sectionRef = useRef<HTMLElement | null>(null);
-  const pinContainerRef = useRef<HTMLDivElement | null>(null);
-  const redBgRef = useRef<HTMLDivElement | null>(null);
-  const redGlowRef = useRef<HTMLDivElement | null>(null);
-  const textRef = useRef<HTMLHeadingElement | null>(null);
+  const sectionRef = useRef<HTMLElement | null>(null)
+  const pinContainerRef = useRef<HTMLDivElement | null>(null)
+  const redBgRef = useRef<HTMLDivElement | null>(null)
+  const redGlowRef = useRef<HTMLDivElement | null>(null)
+  const textRef = useRef<HTMLHeadingElement | null>(null)
 
   const words = [
     { text: "We", isItalic: false },
@@ -20,26 +20,26 @@ export const Section3Focus: React.FC = () => {
     { text: "the", isItalic: true },
     { text: "last", isItalic: true },
     { text: "mile", isItalic: true },
-  ];
+  ]
 
   useEffect(() => {
     const prefersReducedMotion =
       typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
-    const wordElements = textRef.current?.querySelectorAll(".focus-word");
+    const wordElements = textRef.current?.querySelectorAll(".focus-word")
 
     if (prefersReducedMotion) {
       if (wordElements) {
-        gsap.set(wordElements, { opacity: 1, filter: "blur(0px)" });
+        gsap.set(wordElements, { opacity: 1, filter: "blur(0px)" })
       }
       if (redBgRef.current) {
-        gsap.set(redBgRef.current, { opacity: 1 });
+        gsap.set(redBgRef.current, { opacity: 1 })
       }
       if (redGlowRef.current) {
-        gsap.set(redGlowRef.current, { opacity: 1, scaleY: 1 });
+        gsap.set(redGlowRef.current, { opacity: 1, scaleY: 1 })
       }
-      return;
+      return
     }
 
     const ctx = gsap.context(() => {
@@ -53,15 +53,15 @@ export const Section3Focus: React.FC = () => {
           scrub: 0.9,
           anticipatePin: 1,
         },
-      });
+      })
 
       // 1. Clean white & soft rose gradient fades in
       tl.fromTo(
         redBgRef.current,
         { opacity: 0 },
         { opacity: 1, duration: 0.35, ease: "power2.out" },
-        0
-      );
+        0,
+      )
 
       // 2. Soft red glow rises from bottom edge via scaleY & opacity
       tl.fromTo(
@@ -77,8 +77,8 @@ export const Section3Focus: React.FC = () => {
           duration: 0.5,
           ease: "power2.out",
         },
-        0.05
-      );
+        0.05,
+      )
 
       // 3. Split words animate: opacity 0.15 -> 1 and blur 8px -> 0
       if (wordElements && wordElements.length > 0) {
@@ -95,15 +95,15 @@ export const Section3Focus: React.FC = () => {
             duration: 0.45,
             ease: "power2.out",
           },
-          0.1
-        );
+          0.1,
+        )
       }
-    }, sectionRef);
+    }, sectionRef)
 
     return () => {
-      ctx.revert();
-    };
-  }, []);
+      ctx.revert()
+    }
+  }, [])
 
   return (
     <section
@@ -171,12 +171,13 @@ export const Section3Focus: React.FC = () => {
 
           {/* Micro subline below */}
           <p className="mt-6 text-xs sm:text-sm font-light text-[#1A0F12]/75 max-w-lg mx-auto tracking-normal">
-            Where applications stall, names get misspelled, and rights go unclaimed.
+            Where applications stall, names get misspelled, and rights go
+            unclaimed.
           </p>
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default Section3Focus;
+export default Section3Focus

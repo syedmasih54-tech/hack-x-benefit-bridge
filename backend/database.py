@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import declarative_base, sessionmaker
-from sqlalchemy.pool import NullPool
+from sqlalchemy.pool import NullPool, QueuePool
 
 # Support Supabase / Postgres or local/serverless SQLite
 raw_db_url = os.getenv("DATABASE_URL", "").strip()
@@ -54,6 +54,7 @@ else:
             "check_same_thread": False,
             "timeout": 30.0,
         },
+        poolclass=QueuePool,
         pool_size=10,
         max_overflow=20,
         pool_timeout=30.0,

@@ -1,33 +1,36 @@
-import React, { useState } from "react";
-import SplashScreen from "./SplashScreen";
+import React, { useState } from "react"
+import SplashScreen from "./SplashScreen"
 
-type Language = "en" | "hi";
+type Language = "en" | "hi"
 
 interface TrackedApplication {
-  id: string;
-  applicant: string;
-  scheme: string;
-  status: "Submitted" | "Under Review" | "Verified" | "Dispatched";
-  slaDaysTotal: number;
-  slaDaysRemaining: number;
-  targetDate: string;
-  dbtStatus: "Linked" | "Pending" | "Variation Detected";
+  id: string
+  applicant: string
+  scheme: string
+  status: "Submitted" | "Under Review" | "Verified" | "Dispatched"
+  slaDaysTotal: number
+  slaDaysRemaining: number
+  targetDate: string
+  dbtStatus: "Linked" | "Pending" | "Variation Detected"
 }
 
 export const App: React.FC = () => {
   // Splash Screen State
-  const [showSplash, setShowSplash] = useState<boolean>(true);
+  const [showSplash, setShowSplash] = useState<boolean>(true)
 
   // App State
-  const [lang, setLang] = useState<Language>("en");
-  const [searchToken, setSearchToken] = useState<string>("");
-  const [activeModal, setActiveModal] = useState<"none" | "digilocker" | "voice" | "docDoctor" | "tracker">("none");
-  const [copiedToken, setCopiedToken] = useState<boolean>(false);
+  const [lang, setLang] = useState<Language>("en")
+  const [searchToken, setSearchToken] = useState<string>("")
+  const [activeModal, setActiveModal] =
+    useState<"none" | "digilocker" | "voice" | "docDoctor" | "tracker">("none")
+  const [copiedToken, setCopiedToken] = useState<boolean>(false)
 
   // Voice Interaction Simulated States
-  const [isRecording, setIsRecording] = useState<boolean>(false);
-  const [voiceStep, setVoiceStep] = useState<"idle" | "listening" | "processed">("idle");
-  const [activeAudioPrompt, setActiveAudioPrompt] = useState<"widow" | "scholarship" | "kisan">("widow");
+  const [isRecording, setIsRecording] = useState<boolean>(false)
+  const [voiceStep, setVoiceStep] =
+    useState<"idle" | "listening" | "processed">("idle")
+  const [activeAudioPrompt, setActiveAudioPrompt] =
+    useState<"widow" | "scholarship" | "kisan">("widow")
 
   // Sample Tracked Applications
   const sampleApps: Record<string, TrackedApplication> = {
@@ -61,17 +64,18 @@ export const App: React.FC = () => {
       targetDate: "18-Oct-2026",
       dbtStatus: "Linked",
     },
-  };
+  }
 
-  const [activeTrackedApp, setActiveTrackedApp] = useState<TrackedApplication | null>(null);
+  const [activeTrackedApp, setActiveTrackedApp] =
+    useState<TrackedApplication | null>(null)
 
   const handleTrackSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const cleanId = searchToken.trim().toUpperCase();
-    if (!cleanId) return;
+    e.preventDefault()
+    const cleanId = searchToken.trim().toUpperCase()
+    if (!cleanId) return
 
     if (sampleApps[cleanId]) {
-      setActiveTrackedApp(sampleApps[cleanId]);
+      setActiveTrackedApp(sampleApps[cleanId])
     } else {
       setActiveTrackedApp({
         id: cleanId,
@@ -82,16 +86,16 @@ export const App: React.FC = () => {
         slaDaysRemaining: 18,
         targetDate: "31-Oct-2026",
         dbtStatus: "Linked",
-      });
+      })
     }
-    setActiveModal("tracker");
-  };
+    setActiveModal("tracker")
+  }
 
   const handleCopyToken = (token: string) => {
-    navigator.clipboard.writeText(token);
-    setCopiedToken(true);
-    setTimeout(() => setCopiedToken(false), 2200);
-  };
+    navigator.clipboard.writeText(token)
+    setCopiedToken(true)
+    setTimeout(() => setCopiedToken(false), 2200)
+  }
 
   const t = {
     en: {
@@ -162,7 +166,7 @@ export const App: React.FC = () => {
         "नागरिक अधिकार पत्र के तहत गारंटीकृत वैधानिक निवारण: ३० दिन • १००% सीपीग्राम्स (CPGRAMS) अपीलीय निगरानी • शून्य आधार भंडारण • प्रत्यक्ष लाभ अंतरण (DBT) सक्रिय",
       replaySplash: "सिनेमैटिक इंट्रो पुनः देखें",
     },
-  }[lang];
+  }[lang]
 
   return (
     <div className="min-h-screen bg-[#0B0F19] text-[#F9FAFB] flex flex-col font-sans selection:bg-[#2563EB] selection:text-white relative">
@@ -177,7 +181,6 @@ export const App: React.FC = () => {
       {/* 1. TOP NAVIGATION BAR */}
       <header className="sticky top-0 z-40 bg-[#0B0F19]/80 backdrop-blur-md border-b border-[#1F2937] px-4 sm:px-8 py-3.5">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          
           {/* Left: Logo & Live Connection Pill */}
           <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
             <div className="flex items-center gap-2.5">
@@ -192,7 +195,11 @@ export const App: React.FC = () => {
                   strokeLinejoin="round"
                 >
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                  <path d="M7 11c1.5 3 8.5 3 10 0" stroke="#FB923C" strokeWidth="2" />
+                  <path
+                    d="M7 11c1.5 3 8.5 3 10 0"
+                    stroke="#FB923C"
+                    strokeWidth="2"
+                  />
                 </svg>
               </div>
               <div>
@@ -202,7 +209,9 @@ export const App: React.FC = () => {
                     GOV
                   </span>
                 </span>
-                <span className="text-[10px] text-slate-400 block -mt-0.5">Citizen Welfare Navigator</span>
+                <span className="text-[10px] text-slate-400 block -mt-0.5">
+                  Citizen Welfare Navigator
+                </span>
               </div>
             </div>
 
@@ -241,7 +250,10 @@ export const App: React.FC = () => {
 
           {/* Right: Quick Track Status Input & Citizen Badge */}
           <div className="flex items-center gap-2.5 w-full sm:w-auto">
-            <form onSubmit={handleTrackSubmit} className="relative flex items-center w-full sm:w-64">
+            <form
+              onSubmit={handleTrackSubmit}
+              className="relative flex items-center w-full sm:w-64"
+            >
               <input
                 type="text"
                 value={searchToken}
@@ -267,7 +279,6 @@ export const App: React.FC = () => {
       {/* 2. HERO SECTION */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-8 sm:py-12 space-y-12 relative z-10">
         <section className="text-center max-w-3xl mx-auto space-y-4">
-          
           {/* Statutory Badge */}
           <div className="inline-flex items-center gap-2 bg-[#161F30]/80 border border-[#2563EB]/40 px-3.5 py-1.5 rounded-full text-xs font-semibold text-blue-200 backdrop-blur-md shadow-sm">
             <span className="w-2 h-2 rounded-full bg-[#FB923C]" />
@@ -316,19 +327,32 @@ export const App: React.FC = () => {
 
         {/* 3. ACTION HUB (3 Interactive Cards in Dark Glassmorphism) */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
           {/* CARD 1: DigiLocker Direct Apply */}
           <div className="group relative bg-[#111827]/80 backdrop-blur-md border border-[#1F2937] hover:border-[#2563EB]/60 rounded-2xl p-6 flex flex-col justify-between shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
             {/* Top Royal Blue Glow Border */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#2563EB] to-cyan-400" />
-            
+
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 {/* Official DigiLocker Cloud & Shield Icon */}
                 <div className="w-12 h-12 rounded-xl bg-blue-950/80 border border-blue-800/50 flex items-center justify-center text-blue-400 shadow-inner group-hover:scale-105 transition-transform">
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg
+                    className="w-6 h-6"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
                     <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
-                    <rect x="10" y="11" width="4" height="4" rx="1" fill="#2563EB" stroke="#2563EB" />
+                    <rect
+                      x="10"
+                      y="11"
+                      width="4"
+                      height="4"
+                      rx="1"
+                      fill="#2563EB"
+                      stroke="#2563EB"
+                    />
                   </svg>
                 </div>
                 <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-400 bg-blue-950/80 px-2.5 py-1 rounded-full border border-blue-900/50">
@@ -340,8 +364,12 @@ export const App: React.FC = () => {
                 <h3 className="text-lg font-bold text-white group-hover:text-blue-300 transition-colors">
                   {t.card1Title}
                 </h3>
-                <span className="text-xs font-semibold text-slate-400 block mb-2">{t.card1Sub}</span>
-                <p className="text-xs text-slate-300 leading-relaxed">{t.card1Desc}</p>
+                <span className="text-xs font-semibold text-slate-400 block mb-2">
+                  {t.card1Sub}
+                </span>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  {t.card1Desc}
+                </p>
               </div>
 
               <div className="space-y-1.5 pt-2 text-[11px] text-slate-400 font-mono">
@@ -362,7 +390,13 @@ export const App: React.FC = () => {
                 onClick={() => setActiveModal("digilocker")}
                 className="w-full bg-[#2563EB] hover:bg-blue-600 text-white font-bold text-xs py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-600/20 active:scale-[0.98] cursor-pointer"
               >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  className="w-4 h-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                   <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                 </svg>
@@ -380,7 +414,13 @@ export const App: React.FC = () => {
               <div className="flex items-center justify-between">
                 {/* Microphone Icon with Animated Soundwave Visualizer */}
                 <div className="w-12 h-12 rounded-xl bg-amber-950/80 border border-amber-800/50 flex items-center justify-center text-[#FB923C] shadow-inner group-hover:scale-105 transition-transform">
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg
+                    className="w-6 h-6"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
                     <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
                     <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
                     <line x1="12" x2="12" y1="19" y2="22" />
@@ -401,13 +441,21 @@ export const App: React.FC = () => {
                 <h3 className="text-lg font-bold text-white group-hover:text-amber-300 transition-colors">
                   {t.card2Title}
                 </h3>
-                <span className="text-xs font-semibold text-slate-400 block mb-2">{t.card2Sub}</span>
-                <p className="text-xs text-slate-300 leading-relaxed">{t.card2Desc}</p>
+                <span className="text-xs font-semibold text-slate-400 block mb-2">
+                  {t.card2Sub}
+                </span>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  {t.card2Desc}
+                </p>
               </div>
 
               <div className="bg-[#161F30]/90 border border-slate-700/60 p-2.5 rounded-xl text-[11px] text-slate-300 font-mono flex items-center justify-between">
-                <span className="truncate">"मैं सुनीता देवी, 65 वर्ष, विधवा पेंशन..."</span>
-                <span className="text-[#FB923C] text-[10px] shrink-0 font-bold ml-2">DEVNAGARI</span>
+                <span className="truncate">
+                  "मैं सुनीता देवी, 65 वर्ष, विधवा पेंशन..."
+                </span>
+                <span className="text-[#FB923C] text-[10px] shrink-0 font-bold ml-2">
+                  DEVNAGARI
+                </span>
               </div>
             </div>
 
@@ -417,7 +465,13 @@ export const App: React.FC = () => {
                 onClick={() => setActiveModal("voice")}
                 className="w-full bg-gradient-to-r from-[#F97316] to-[#FB923C] hover:from-amber-600 hover:to-amber-500 text-slate-950 font-bold text-xs py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-orange-500/20 active:scale-[0.98] cursor-pointer"
               >
-                <svg className="w-4 h-4 text-slate-950" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <svg
+                  className="w-4 h-4 text-slate-950"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
                   <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
                   <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
                 </svg>
@@ -435,7 +489,13 @@ export const App: React.FC = () => {
               <div className="flex items-center justify-between">
                 {/* Document Doctor Icon */}
                 <div className="w-12 h-12 rounded-xl bg-emerald-950/80 border border-emerald-800/50 flex items-center justify-center text-[#10B981] shadow-inner group-hover:scale-105 transition-transform">
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg
+                    className="w-6 h-6"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                     <polyline points="14 2 14 8 20 8" />
                     <line x1="9" y1="15" x2="15" y2="15" />
@@ -452,19 +512,29 @@ export const App: React.FC = () => {
                 <h3 className="text-lg font-bold text-white group-hover:text-emerald-300 transition-colors">
                   {t.card3Title}
                 </h3>
-                <span className="text-xs font-semibold text-slate-400 block mb-2">{t.card3Sub}</span>
-                <p className="text-xs text-slate-300 leading-relaxed">{t.card3Desc}</p>
+                <span className="text-xs font-semibold text-slate-400 block mb-2">
+                  {t.card3Sub}
+                </span>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  {t.card3Desc}
+                </p>
               </div>
 
               {/* Visual Matcher Demonstration Pill */}
               <div className="p-3 bg-[#161F30] border border-slate-700 rounded-xl space-y-1.5 text-xs">
                 <div className="flex items-center justify-between text-slate-300">
-                  <span className="text-slate-400 text-[10px]">Ration Card:</span>
+                  <span className="text-slate-400 text-[10px]">
+                    Ration Card:
+                  </span>
                   <strong className="text-white font-mono">Sunita Devi</strong>
                 </div>
                 <div className="flex items-center justify-between text-slate-300">
-                  <span className="text-slate-400 text-[10px]">Bank Passbook:</span>
-                  <strong className="text-amber-300 font-mono">Sunitha Devi</strong>
+                  <span className="text-slate-400 text-[10px]">
+                    Bank Passbook:
+                  </span>
+                  <strong className="text-amber-300 font-mono">
+                    Sunitha Devi
+                  </strong>
                 </div>
                 <div className="pt-1 border-t border-slate-800 flex items-center justify-between text-[10px] text-emerald-400 font-semibold">
                   <span>Match Score: 95%</span>
@@ -479,7 +549,13 @@ export const App: React.FC = () => {
                 onClick={() => setActiveModal("docDoctor")}
                 className="w-full bg-[#10B981] hover:bg-emerald-600 text-slate-950 font-bold text-xs py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20 active:scale-[0.98] cursor-pointer"
               >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  className="w-4 h-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                   <polyline points="22 4 12 14.01 9 11.01" />
                 </svg>
@@ -492,14 +568,23 @@ export const App: React.FC = () => {
         {/* 4. REPLAY SPLASH & FOOTER HELPER */}
         <section className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 pt-4 border-t border-[#1F2937]">
           <div>
-            <span>BenefitBridge Gov-Tech Engine v2.4 • MeitY &amp; API Setu Verified Pipeline</span>
+            <span>
+              BenefitBridge Gov-Tech Engine v2.4 • MeitY &amp; API Setu Verified
+              Pipeline
+            </span>
           </div>
           <button
             type="button"
             onClick={() => setShowSplash(true)}
             className="text-slate-400 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer"
           >
-            <svg className="w-3.5 h-3.5 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              className="w-3.5 h-3.5 text-blue-400"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <polygon points="5 3 19 12 5 21 5 3" />
             </svg>
             <span>{t.replaySplash}</span>
@@ -513,30 +598,46 @@ export const App: React.FC = () => {
           <div className="flex items-center gap-6 whitespace-nowrap">
             <span className="flex items-center gap-1.5 text-amber-300 font-bold">
               <span className="w-2 h-2 rounded-full bg-[#FB923C] animate-pulse" />
-              <span>GUARANTEED STATUTORY DISPOSAL: 30 DAYS UNDER CITIZEN CHARTERS</span>
+              <span>
+                GUARANTEED STATUTORY DISPOSAL: 30 DAYS UNDER CITIZEN CHARTERS
+              </span>
             </span>
             <span>•</span>
-            <span className="text-emerald-400">100% CPGRAMS ESCALATION READY</span>
+            <span className="text-emerald-400">
+              100% CPGRAMS ESCALATION READY
+            </span>
             <span>•</span>
             <span>ZERO AADHAAR NUMBERS STORED</span>
             <span>•</span>
-            <span className="text-blue-400">DIRECT BENEFIT TRANSFER (DBT) PRE-VERIFIED</span>
+            <span className="text-blue-400">
+              DIRECT BENEFIT TRANSFER (DBT) PRE-VERIFIED
+            </span>
             <span>•</span>
-            <span className="text-slate-300">RIGHT TO PUBLIC SERVICES ACT SEC 4 COMPLIANT</span>
+            <span className="text-slate-300">
+              RIGHT TO PUBLIC SERVICES ACT SEC 4 COMPLIANT
+            </span>
           </div>
           <div className="flex items-center gap-6 whitespace-nowrap">
             <span className="flex items-center gap-1.5 text-amber-300 font-bold">
               <span className="w-2 h-2 rounded-full bg-[#FB923C] animate-pulse" />
-              <span>GUARANTEED STATUTORY DISPOSAL: 30 DAYS UNDER CITIZEN CHARTERS</span>
+              <span>
+                GUARANTEED STATUTORY DISPOSAL: 30 DAYS UNDER CITIZEN CHARTERS
+              </span>
             </span>
             <span>•</span>
-            <span className="text-emerald-400">100% CPGRAMS ESCALATION READY</span>
+            <span className="text-emerald-400">
+              100% CPGRAMS ESCALATION READY
+            </span>
             <span>•</span>
             <span>ZERO AADHAAR NUMBERS STORED</span>
             <span>•</span>
-            <span className="text-blue-400">DIRECT BENEFIT TRANSFER (DBT) PRE-VERIFIED</span>
+            <span className="text-blue-400">
+              DIRECT BENEFIT TRANSFER (DBT) PRE-VERIFIED
+            </span>
             <span>•</span>
-            <span className="text-slate-300">RIGHT TO PUBLIC SERVICES ACT SEC 4 COMPLIANT</span>
+            <span className="text-slate-300">
+              RIGHT TO PUBLIC SERVICES ACT SEC 4 COMPLIANT
+            </span>
           </div>
         </div>
       </footer>
@@ -557,13 +658,23 @@ export const App: React.FC = () => {
 
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-blue-900/60 border border-blue-600 flex items-center justify-center text-blue-300">
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  className="w-5 h-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
                 </svg>
               </div>
               <div>
-                <h3 className="font-bold text-white text-base">DigiLocker Authenticated Profile</h3>
-                <span className="text-xs text-emerald-400 font-medium">✓ Cryptographic Digital Signature Verified</span>
+                <h3 className="font-bold text-white text-base">
+                  DigiLocker Authenticated Profile
+                </h3>
+                <span className="text-xs text-emerald-400 font-medium">
+                  ✓ Cryptographic Digital Signature Verified
+                </span>
               </div>
             </div>
 
@@ -578,11 +689,15 @@ export const App: React.FC = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-400">Welfare Scheme:</span>
-                <strong className="text-amber-300">Indira Gandhi National Widow Pension (IGNWPS)</strong>
+                <strong className="text-amber-300">
+                  Indira Gandhi National Widow Pension (IGNWPS)
+                </strong>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-400">Statutory SLA Timeline:</span>
-                <span className="text-emerald-400 font-bold">30 Days Guaranteed</span>
+                <span className="text-emerald-400 font-bold">
+                  30 Days Guaranteed
+                </span>
               </div>
             </div>
 
@@ -593,8 +708,13 @@ export const App: React.FC = () => {
               </span>
               <div className="p-3 bg-[#0B0F19] border border-slate-800 rounded-xl flex items-center justify-between">
                 <div>
-                  <div className="font-bold text-white">Ration Card (NFSA / BPL)</div>
-                  <span className="text-[10px] text-slate-500">Dept of Food &amp; Civil Supplies • in.gov.dord.ration:10928374</span>
+                  <div className="font-bold text-white">
+                    Ration Card (NFSA / BPL)
+                  </div>
+                  <span className="text-[10px] text-slate-500">
+                    Dept of Food &amp; Civil Supplies •
+                    in.gov.dord.ration:10928374
+                  </span>
                 </div>
                 <span className="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded font-bold">
                   Pre-Verified
@@ -603,7 +723,9 @@ export const App: React.FC = () => {
               <div className="p-3 bg-[#0B0F19] border border-slate-800 rounded-xl flex items-center justify-between">
                 <div>
                   <div className="font-bold text-white">Income Certificate</div>
-                  <span className="text-[10px] text-slate-500">Revenue Dept • Annual Income: ₹0 (BPL / Eligible)</span>
+                  <span className="text-[10px] text-slate-500">
+                    Revenue Dept • Annual Income: ₹0 (BPL / Eligible)
+                  </span>
                 </div>
                 <span className="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded font-bold">
                   Pre-Verified
@@ -618,14 +740,15 @@ export const App: React.FC = () => {
                   setActiveTrackedApp({
                     id: "APP-DL-WIDOW-9214",
                     applicant: "Sunita Devi",
-                    scheme: "Indira Gandhi National Widow Pension Scheme (IGNWPS)",
+                    scheme:
+                      "Indira Gandhi National Widow Pension Scheme (IGNWPS)",
                     status: "Submitted",
                     slaDaysTotal: 30,
                     slaDaysRemaining: 30,
                     targetDate: "13-Nov-2026",
                     dbtStatus: "Linked",
-                  });
-                  setActiveModal("tracker");
+                  })
+                  setActiveModal("tracker")
                 }}
                 className="w-full bg-[#2563EB] hover:bg-blue-600 text-white font-bold text-xs py-3 rounded-xl transition cursor-pointer"
               >
@@ -652,14 +775,24 @@ export const App: React.FC = () => {
 
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-950 border border-amber-600 flex items-center justify-center text-[#FB923C]">
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  className="w-5 h-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
                   <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
                 </svg>
               </div>
               <div>
-                <h3 className="font-bold text-white text-base">Bilingual Voice Intake Engine</h3>
-                <span className="text-xs text-amber-400 font-medium">Whisper Model • Aadhaar Scrubbed Real-Time</span>
+                <h3 className="font-bold text-white text-base">
+                  Bilingual Voice Intake Engine
+                </h3>
+                <span className="text-xs text-amber-400 font-medium">
+                  Whisper Model • Aadhaar Scrubbed Real-Time
+                </span>
               </div>
             </div>
 
@@ -668,9 +801,9 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => {
-                  setIsRecording(!isRecording);
-                  setVoiceStep("listening");
-                  setTimeout(() => setVoiceStep("processed"), 1800);
+                  setIsRecording(!isRecording)
+                  setVoiceStep("listening")
+                  setTimeout(() => setVoiceStep("processed"), 1800)
                 }}
                 className={`w-20 h-20 rounded-full flex items-center justify-center transition-all cursor-pointer ${
                   isRecording
@@ -678,13 +811,21 @@ export const App: React.FC = () => {
                     : "bg-[#FB923C] hover:bg-amber-500 text-slate-950 ring-4 ring-[#FB923C]/20"
                 }`}
               >
-                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <svg
+                  className="w-8 h-8"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
                   <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
                   <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
                 </svg>
               </button>
               <span className="text-xs font-mono text-slate-400">
-                {isRecording ? "Listening... (Speaking in Hindi / English)" : "Click mic to speak or select a sample"}
+                {isRecording
+                  ? "Listening... (Speaking in Hindi / English)"
+                  : "Click mic to speak or select a sample"}
               </span>
             </div>
 
@@ -697,8 +838,8 @@ export const App: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    setActiveAudioPrompt("widow");
-                    setVoiceStep("processed");
+                    setActiveAudioPrompt("widow")
+                    setVoiceStep("processed")
                   }}
                   className={`p-2.5 rounded-xl border text-left cursor-pointer transition ${
                     activeAudioPrompt === "widow"
@@ -706,14 +847,18 @@ export const App: React.FC = () => {
                       : "bg-[#161F30] border-slate-700 text-slate-300"
                   }`}
                 >
-                  <div className="font-bold text-[11px]">Hindi: Sunita Devi (65y)</div>
-                  <div className="text-[10px] text-slate-400">"मैं सुनीता देवी, 65 वर्ष, विधवा पेंशन..."</div>
+                  <div className="font-bold text-[11px]">
+                    Hindi: Sunita Devi (65y)
+                  </div>
+                  <div className="text-[10px] text-slate-400">
+                    "मैं सुनीता देवी, 65 वर्ष, विधवा पेंशन..."
+                  </div>
                 </button>
                 <button
                   type="button"
                   onClick={() => {
-                    setActiveAudioPrompt("scholarship");
-                    setVoiceStep("processed");
+                    setActiveAudioPrompt("scholarship")
+                    setVoiceStep("processed")
                   }}
                   className={`p-2.5 rounded-xl border text-left cursor-pointer transition ${
                     activeAudioPrompt === "scholarship"
@@ -721,8 +866,12 @@ export const App: React.FC = () => {
                       : "bg-[#161F30] border-slate-700 text-slate-300"
                   }`}
                 >
-                  <div className="font-bold text-[11px]">English: SC Scholarship</div>
-                  <div className="text-[10px] text-slate-400">"I am SC student Amit, income 80k..."</div>
+                  <div className="font-bold text-[11px]">
+                    English: SC Scholarship
+                  </div>
+                  <div className="text-[10px] text-slate-400">
+                    "I am SC student Amit, income 80k..."
+                  </div>
                 </button>
               </div>
             </div>
@@ -735,13 +884,36 @@ export const App: React.FC = () => {
                   <span className="text-slate-400">Confidence: 99.2%</span>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-slate-300 pt-1">
-                  <div>Age: <strong className="text-white">{activeAudioPrompt === "widow" ? "65 Years" : "20 Years"}</strong></div>
-                  <div>Gender: <strong className="text-white">{activeAudioPrompt === "widow" ? "Female" : "Male"}</strong></div>
-                  <div>Marital: <strong className="text-white">{activeAudioPrompt === "widow" ? "Widow" : "Single"}</strong></div>
-                  <div>Income: <strong className="text-white">{activeAudioPrompt === "widow" ? "₹0 (Nil)" : "₹80,000"}</strong></div>
+                  <div>
+                    Age:{" "}
+                    <strong className="text-white">
+                      {activeAudioPrompt === "widow" ? "65 Years" : "20 Years"}
+                    </strong>
+                  </div>
+                  <div>
+                    Gender:{" "}
+                    <strong className="text-white">
+                      {activeAudioPrompt === "widow" ? "Female" : "Male"}
+                    </strong>
+                  </div>
+                  <div>
+                    Marital:{" "}
+                    <strong className="text-white">
+                      {activeAudioPrompt === "widow" ? "Widow" : "Single"}
+                    </strong>
+                  </div>
+                  <div>
+                    Income:{" "}
+                    <strong className="text-white">
+                      {activeAudioPrompt === "widow" ? "₹0 (Nil)" : "₹80,000"}
+                    </strong>
+                  </div>
                 </div>
                 <div className="pt-2 text-[11px] text-amber-300 font-semibold border-t border-slate-800">
-                  Target Scheme: {activeAudioPrompt === "widow" ? "Indira Gandhi National Widow Pension (IGNWPS)" : "Post-Matric Scholarship"}
+                  Target Scheme:{" "}
+                  {activeAudioPrompt === "widow"
+                    ? "Indira Gandhi National Widow Pension (IGNWPS)"
+                    : "Post-Matric Scholarship"}
                 </div>
               </div>
             )}
@@ -752,15 +924,21 @@ export const App: React.FC = () => {
                 onClick={() => {
                   setActiveTrackedApp({
                     id: "APP-VOICE-8819",
-                    applicant: activeAudioPrompt === "widow" ? "Sunita Devi" : "Amit Kumar",
-                    scheme: activeAudioPrompt === "widow" ? "Indira Gandhi National Widow Pension Scheme" : "Post-Matric Scholarship",
+                    applicant:
+                      activeAudioPrompt === "widow"
+                        ? "Sunita Devi"
+                        : "Amit Kumar",
+                    scheme:
+                      activeAudioPrompt === "widow"
+                        ? "Indira Gandhi National Widow Pension Scheme"
+                        : "Post-Matric Scholarship",
                     status: "Submitted",
                     slaDaysTotal: 30,
                     slaDaysRemaining: 30,
                     targetDate: "13-Nov-2026",
                     dbtStatus: "Linked",
-                  });
-                  setActiveModal("tracker");
+                  })
+                  setActiveModal("tracker")
                 }}
                 className="w-full bg-[#FB923C] hover:bg-amber-500 text-slate-950 font-bold text-xs py-3 rounded-xl transition cursor-pointer"
               >
@@ -787,14 +965,24 @@ export const App: React.FC = () => {
 
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-emerald-950 border border-emerald-600 flex items-center justify-center text-[#10B981]">
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  className="w-5 h-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                   <polyline points="14 2 14 8 20 8" />
                 </svg>
               </div>
               <div>
-                <h3 className="font-bold text-white text-base">Document Doctor Mismatch Analyzer</h3>
-                <span className="text-xs text-emerald-400 font-medium">PFMS / DBT Bank Discrepancy Prevention</span>
+                <h3 className="font-bold text-white text-base">
+                  Document Doctor Mismatch Analyzer
+                </h3>
+                <span className="text-xs text-emerald-400 font-medium">
+                  PFMS / DBT Bank Discrepancy Prevention
+                </span>
               </div>
             </div>
 
@@ -805,26 +993,41 @@ export const App: React.FC = () => {
                 <span className="text-slate-400">Extracted Name String:</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-white">Ration Card (NFSA)</span>
-                <span className="font-mono bg-slate-900 px-2 py-0.5 rounded text-blue-300">Sunita Devi</span>
+                <span className="font-semibold text-white">
+                  Ration Card (NFSA)
+                </span>
+                <span className="font-mono bg-slate-900 px-2 py-0.5 rounded text-blue-300">
+                  Sunita Devi
+                </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-white">SBI Bank Passbook</span>
-                <span className="font-mono bg-slate-900 px-2 py-0.5 rounded text-amber-300">Sunitha Devi</span>
+                <span className="font-semibold text-white">
+                  SBI Bank Passbook
+                </span>
+                <span className="font-mono bg-slate-900 px-2 py-0.5 rounded text-amber-300">
+                  Sunitha Devi
+                </span>
               </div>
               <div className="pt-2 border-t border-slate-700 flex items-center justify-between">
                 <span className="text-slate-400">Levenshtein Distance:</span>
-                <span className="text-emerald-400 font-bold">1 character ('h' variation)</span>
+                <span className="text-emerald-400 font-bold">
+                  1 character ('h' variation)
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-slate-400">Soundex Phonetic Code:</span>
-                <span className="text-emerald-400 font-bold">S530 (Exact Match)</span>
+                <span className="text-emerald-400 font-bold">
+                  S530 (Exact Match)
+                </span>
               </div>
             </div>
 
             {/* Warning Note */}
             <div className="p-3 bg-amber-950/40 border border-amber-600/40 rounded-xl text-xs text-amber-200 leading-relaxed">
-              <strong>BenefitBridge Assessment:</strong> Minor spelling variation noted. BenefitBridge does NOT reject your application, but resolving this difference now will prevent direct benefit transfer (DBT) bank delays later.
+              <strong>BenefitBridge Assessment:</strong> Minor spelling
+              variation noted. BenefitBridge does NOT reject your application,
+              but resolving this difference now will prevent direct benefit
+              transfer (DBT) bank delays later.
             </div>
 
             <div className="pt-2 flex gap-3">
@@ -856,7 +1059,9 @@ export const App: React.FC = () => {
 
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-mono text-slate-400 uppercase">Application Reference</span>
+                <span className="text-[10px] font-mono text-slate-400 uppercase">
+                  Application Reference
+                </span>
                 <div className="font-mono text-lg font-black text-white flex items-center gap-2">
                   <span>{activeTrackedApp.id}</span>
                   <button
@@ -876,23 +1081,37 @@ export const App: React.FC = () => {
             <div className="bg-[#161F30] p-4 rounded-xl border border-slate-700 space-y-2.5 text-xs">
               <div className="flex justify-between">
                 <span className="text-slate-400">Applicant Name:</span>
-                <strong className="text-white">{activeTrackedApp.applicant}</strong>
+                <strong className="text-white">
+                  {activeTrackedApp.applicant}
+                </strong>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-400">Welfare Scheme:</span>
-                <span className="text-slate-200 text-right max-w-xs">{activeTrackedApp.scheme}</span>
+                <span className="text-slate-200 text-right max-w-xs">
+                  {activeTrackedApp.scheme}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-400">Statutory SLA Window:</span>
-                <span className="text-blue-300 font-bold">{activeTrackedApp.slaDaysTotal} Days Guaranteed</span>
+                <span className="text-blue-300 font-bold">
+                  {activeTrackedApp.slaDaysTotal} Days Guaranteed
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-400">Resolution Deadline:</span>
-                <span className="text-emerald-400 font-bold">{activeTrackedApp.targetDate}</span>
+                <span className="text-emerald-400 font-bold">
+                  {activeTrackedApp.targetDate}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-400">Bank DBT Status:</span>
-                <span className={activeTrackedApp.dbtStatus === "Linked" ? "text-emerald-400 font-bold" : "text-amber-400 font-bold"}>
+                <span
+                  className={
+                    activeTrackedApp.dbtStatus === "Linked"
+                      ? "text-emerald-400 font-bold"
+                      : "text-amber-400 font-bold"
+                  }
+                >
                   {activeTrackedApp.dbtStatus}
                 </span>
               </div>
@@ -901,17 +1120,22 @@ export const App: React.FC = () => {
             {/* SLA Progress Bar */}
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs">
-                <span className="text-slate-400 font-semibold">Statutory SLA Progress:</span>
-                <span className="text-emerald-400 font-bold">{activeTrackedApp.slaDaysRemaining} Days Left</span>
+                <span className="text-slate-400 font-semibold">
+                  Statutory SLA Progress:
+                </span>
+                <span className="text-emerald-400 font-bold">
+                  {activeTrackedApp.slaDaysRemaining} Days Left
+                </span>
               </div>
               <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full"
                   style={{
                     width: `${Math.round(
-                      ((activeTrackedApp.slaDaysTotal - activeTrackedApp.slaDaysRemaining) /
+                      ((activeTrackedApp.slaDaysTotal -
+                        activeTrackedApp.slaDaysRemaining) /
                         activeTrackedApp.slaDaysTotal) *
-                        100
+                        100,
                     )}%`,
                   }}
                 />
@@ -931,6 +1155,6 @@ export const App: React.FC = () => {
         </div>
       )}
     </div>
-  );
-};
-export default App;
+  )
+}
+export default App

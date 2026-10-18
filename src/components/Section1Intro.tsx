@@ -1,184 +1,187 @@
-import React, { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
-import Wordmark from "./Wordmark";
+import React, { useEffect, useRef, useState } from "react"
+import gsap from "gsap"
+import Wordmark from "./Wordmark"
 
 interface Section1IntroProps {
-  onComplete: () => void;
-  underneathWordmarkRef?: React.RefObject<HTMLDivElement | null>;
+  onComplete: () => void
+  underneathWordmarkRef?: React.RefObject<HTMLDivElement | null>
 }
 
 export const Section1Intro: React.FC<Section1IntroProps> = ({
   onComplete,
   underneathWordmarkRef,
 }) => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const redLayerRef = useRef<HTMLDivElement | null>(null);
-  const dashRef = useRef<HTMLDivElement | null>(null);
-  const whiteBandRef = useRef<HTMLDivElement | null>(null);
-  const middleLineRef = useRef<HTMLDivElement | null>(null);
-  const dotsRef = useRef<HTMLDivElement | null>(null);
-  const wordmarkWrapRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const redLayerRef = useRef<HTMLDivElement | null>(null)
+  const dashRef = useRef<HTMLDivElement | null>(null)
+  const whiteBandRef = useRef<HTMLDivElement | null>(null)
+  const middleLineRef = useRef<HTMLDivElement | null>(null)
+  const dotsRef = useRef<HTMLDivElement | null>(null)
+  const wordmarkWrapRef = useRef<HTMLDivElement | null>(null)
 
-  const [hasCompleted, setHasCompleted] = useState<boolean>(false);
-  const timelineRef = useRef<gsap.core.Timeline | null>(null);
+  const [hasCompleted, setHasCompleted] = useState<boolean>(false)
+  const timelineRef = useRef<gsap.core.Timeline | null>(null)
 
   // Check if session has seen intro or user prefers reduced motion
   const [hasSeenSession] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return sessionStorage.getItem("bb_intro_seen") === "true";
-  });
+    if (typeof window === "undefined") return false
+    return sessionStorage.getItem("bb_intro_seen") === "true"
+  })
 
   const finishIntro = () => {
-    setHasCompleted(true);
+    setHasCompleted(true)
     if (typeof window !== "undefined") {
-      sessionStorage.setItem("bb_intro_seen", "true");
+      sessionStorage.setItem("bb_intro_seen", "true")
     }
-    onComplete();
-  };
+    onComplete()
+  }
 
   const handleSkip = () => {
     if (timelineRef.current) {
       // Jump to end smoothly
-      timelineRef.current.progress(1);
+      timelineRef.current.progress(1)
     } else {
-      finishIntro();
+      finishIntro()
     }
-  };
+  }
 
   useEffect(() => {
-    if (hasCompleted) return;
+    if (hasCompleted) return
 
     // Respect prefers-reduced-motion
     if (
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
-      finishIntro();
-      return;
+      finishIntro()
+      return
     }
 
-    const ctx = gsap.context(() => {
-      const redLetters = wordmarkWrapRef.current?.querySelectorAll(
-        ".intro-overlay-char"
-      );
-      const underLetters =
-        underneathWordmarkRef?.current?.querySelectorAll(".underneath-char");
+    const ctx = gsap.context(
+      () => {
+        const redLetters = wordmarkWrapRef.current?.querySelectorAll(
+          ".intro-overlay-char",
+        )
+        const underLetters =
+          underneathWordmarkRef?.current?.querySelectorAll(".underneath-char")
 
-      const tl = gsap.timeline({
-        onComplete: () => {
-          finishIntro();
-        },
-      });
-      timelineRef.current = tl;
-
-      // Initial state
-      gsap.set(redLayerRef.current, {
-        clipPath: "inset(0% 0% 0% 0%)",
-        opacity: 1,
-      });
-      gsap.set(dashRef.current, { opacity: 0, scaleX: 0 });
-      gsap.set(whiteBandRef.current, { height: 0, opacity: 1 });
-      gsap.set([middleLineRef.current, dotsRef.current], { opacity: 0 });
-
-      if (redLetters && redLetters.length > 0) {
-        gsap.set(redLetters, { y: "-115%" });
-      }
-      if (underLetters && underLetters.length > 0) {
-        gsap.set(underLetters, { y: "-115%" });
-      }
-
-      // Step 1: Tiny white dash appears at top center (0.1s)
-      tl.to(
-        dashRef.current,
-        {
-          opacity: 1,
-          scaleX: 1,
-          duration: 0.35,
-          ease: "power2.out",
-        },
-        0.1
-      );
-
-      // Step 2: Letters slide down letter by letter (0.2s - 1.4s)
-      // Stagger: 0.05s, 1s each, ease: expo.out
-      if (redLetters && redLetters.length > 0) {
-        tl.to(
-          redLetters,
-          {
-            y: "0%",
-            duration: 1.0,
-            stagger: 0.05,
-            ease: "expo.out",
+        const tl = gsap.timeline({
+          onComplete: () => {
+            finishIntro()
           },
-          0.2
-        );
-      }
+        })
+        timelineRef.current = tl
 
-      if (underLetters && underLetters.length > 0) {
-        tl.to(
-          underLetters,
-          {
-            y: "0%",
-            duration: 1.0,
-            stagger: 0.05,
-            ease: "expo.out",
-          },
-          0.2
-        );
-      }
-
-      // Middle line & dots reveal smoothly
-      tl.to(
-        [middleLineRef.current, dotsRef.current],
-        {
+        // Initial state
+        gsap.set(redLayerRef.current, {
+          clipPath: "inset(0% 0% 0% 0%)",
           opacity: 1,
-          duration: 0.5,
-          ease: "power2.out",
-        },
-        0.5
-      );
+        })
+        gsap.set(dashRef.current, { opacity: 0, scaleX: 0 })
+        gsap.set(whiteBandRef.current, { height: 0, opacity: 1 })
+        gsap.set([middleLineRef.current, dotsRef.current], { opacity: 0 })
 
-      // Step 3: After about 2s, the line grows into a white band (height 0 to 45vh)
-      tl.to(
-        whiteBandRef.current,
-        {
-          height: "45vh",
-          duration: 0.65,
-          ease: "power3.inOut",
-        },
-        2.0
-      );
+        if (redLetters && redLetters.length > 0) {
+          gsap.set(redLetters, { y: "-115%" })
+        }
+        if (underLetters && underLetters.length > 0) {
+          gsap.set(underLetters, { y: "-115%" })
+        }
 
-      // Step 4: Red layer wipes away from the center line outward using
-      // clip-path inset(0 0 0 0) -> inset(50% 0 50% 0) (2.4s)
-      tl.to(
-        redLayerRef.current,
-        {
-          clipPath: "inset(50% 0% 50% 0%)",
-          duration: 0.95,
-          ease: "power4.inOut",
-        },
-        2.4
-      );
+        // Step 1: Tiny white dash appears at top center (0.1s)
+        tl.to(
+          dashRef.current,
+          {
+            opacity: 1,
+            scaleX: 1,
+            duration: 0.35,
+            ease: "power2.out",
+          },
+          0.1,
+        )
 
-      // Fade out final container edge cleanly
-      tl.to(
-        redLayerRef.current,
-        {
-          opacity: 0,
-          duration: 0.25,
-          ease: "power1.out",
-        },
-        3.35
-      );
-    }, containerRef);
+        // Step 2: Letters slide down letter by letter (0.2s - 1.4s)
+        // Stagger: 0.05s, 1s each, ease: expo.out
+        if (redLetters && redLetters.length > 0) {
+          tl.to(
+            redLetters,
+            {
+              y: "0%",
+              duration: 1.0,
+              stagger: 0.05,
+              ease: "expo.out",
+            },
+            0.2,
+          )
+        }
+
+        if (underLetters && underLetters.length > 0) {
+          tl.to(
+            underLetters,
+            {
+              y: "0%",
+              duration: 1.0,
+              stagger: 0.05,
+              ease: "expo.out",
+            },
+            0.2,
+          )
+        }
+
+        // Middle line & dots reveal smoothly
+        tl.to(
+          [middleLineRef.current, dotsRef.current],
+          {
+            opacity: 1,
+            duration: 0.5,
+            ease: "power2.out",
+          },
+          0.5,
+        )
+
+        // Step 3: After about 2s, the line grows into a white band (height 0 to 45vh)
+        tl.to(
+          whiteBandRef.current,
+          {
+            height: "45vh",
+            duration: 0.65,
+            ease: "power3.inOut",
+          },
+          2.0,
+        )
+
+        // Step 4: Red layer wipes away from the center line outward using
+        // clip-path inset(0 0 0 0) -> inset(50% 0 50% 0) (2.4s)
+        tl.to(
+          redLayerRef.current,
+          {
+            clipPath: "inset(50% 0% 50% 0%)",
+            duration: 0.95,
+            ease: "power4.inOut",
+          },
+          2.4,
+        )
+
+        // Fade out final container edge cleanly
+        tl.to(
+          redLayerRef.current,
+          {
+            opacity: 0,
+            duration: 0.25,
+            ease: "power1.out",
+          },
+          3.35,
+        )
+      },
+      containerRef,
+    )
 
     return () => {
-      ctx.revert();
-    };
-  }, [hasCompleted]);
+      ctx.revert()
+    }
+  }, [hasCompleted])
 
-  if (hasCompleted) return null;
+  if (hasCompleted) return null
 
   return (
     <div
@@ -283,7 +286,10 @@ export const Section1Intro: React.FC<Section1IntroProps> = ({
             {/* Right end: tiny "Hindi-first" and three-dot menu */}
             <div className="bg-[#C41528] px-2.5 py-0.5 rounded-full border border-white/30 backdrop-blur-xs flex items-center gap-2">
               <span>Hindi-first</span>
-              <span className="text-[14px] leading-none opacity-80" aria-hidden="true">
+              <span
+                className="text-[14px] leading-none opacity-80"
+                aria-hidden="true"
+              >
                 ⋯
               </span>
             </div>
@@ -306,8 +312,7 @@ export const Section1Intro: React.FC<Section1IntroProps> = ({
         </footer>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Section1Intro;
-
+export default Section1Intro

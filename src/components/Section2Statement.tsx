@@ -1,57 +1,52 @@
+import React, { useEffect, useRef } from "react"
+import gsap from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+import Wordmark from "./Wordmark"
+import { getPortalUrl } from "../lib/urls"
 
-import React, { useEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Wordmark from "./Wordmark";
-import { getPortalUrl } from "../lib/urls";
-
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger)
 
 interface Section2StatementProps {
-  underneathWordmarkRef?: React.RefObject<HTMLDivElement | null>;
+  underneathWordmarkRef?: React.RefObject<HTMLDivElement | null>
 }
 
 export const Section2Statement: React.FC<Section2StatementProps> = ({
   underneathWordmarkRef,
 }) => {
-  const sectionRef = useRef<HTMLElement | null>(null);
-  const headlineRef = useRef<HTMLDivElement | null>(null);
-  const cardsContainerRef = useRef<HTMLDivElement | null>(null);
+  const sectionRef = useRef<HTMLElement | null>(null)
+  const headlineRef = useRef<HTMLDivElement | null>(null)
+  const cardsContainerRef = useRef<HTMLDivElement | null>(null)
 
-  const card1Ref = useRef<HTMLDivElement | null>(null);
-  const card2Ref = useRef<HTMLDivElement | null>(null);
-  const card3Ref = useRef<HTMLDivElement | null>(null);
+  const card1Ref = useRef<HTMLDivElement | null>(null)
+  const card2Ref = useRef<HTMLDivElement | null>(null)
+  const card3Ref = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     // Check reduced motion preference
     const prefersReducedMotion =
       typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
     const ctx = gsap.context(() => {
       // 1. Headline lines reveal upward with a mask
       const headlineLines =
-        headlineRef.current?.querySelectorAll(".headline-line");
+        headlineRef.current?.querySelectorAll(".headline-line")
 
       if (headlineLines && headlineLines.length > 0) {
         if (prefersReducedMotion) {
-          gsap.set(headlineLines, { yPercent: 0, opacity: 1 });
+          gsap.set(headlineLines, { yPercent: 0, opacity: 1 })
         } else {
-          gsap.fromTo(
-            headlineLines,
-            { yPercent: 105 },
-            {
-              yPercent: 0,
-              stagger: 0.08,
-              duration: 0.95,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: headlineRef.current,
-                start: "top 85%",
-                toggleActions: "play none none none",
-              },
-            }
-          );
+          gsap.fromTo(headlineLines, { yPercent: 105 }, {
+            yPercent: 0,
+            stagger: 0.08,
+            duration: 0.95,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: headlineRef.current,
+              start: "top 85%",
+              toggleActions: "play none none none",
+            },
+          })
         }
       }
 
@@ -63,7 +58,7 @@ export const Section2Statement: React.FC<Section2StatementProps> = ({
         card3Ref.current &&
         cardsContainerRef.current
       ) {
-        const isMobile = window.innerWidth < 768;
+        const isMobile = window.innerWidth < 768
 
         // Card 1: Ration Card (Speed 1, slightly rotated -3deg)
         gsap.fromTo(
@@ -82,8 +77,8 @@ export const Section2Statement: React.FC<Section2StatementProps> = ({
               end: "bottom 15%",
               scrub: 1,
             },
-          }
-        );
+          },
+        )
 
         // Card 2: Bank Passbook (Speed 2 - faster scrub, rotated +2.5deg)
         gsap.fromTo(
@@ -102,8 +97,8 @@ export const Section2Statement: React.FC<Section2StatementProps> = ({
               end: "bottom 15%",
               scrub: 1.6,
             },
-          }
-        );
+          },
+        )
 
         // Card 3: Readiness 60% (Speed 3 - medium scrub, rotated -1.5deg)
         gsap.fromTo(
@@ -122,15 +117,15 @@ export const Section2Statement: React.FC<Section2StatementProps> = ({
               end: "bottom 15%",
               scrub: 1.25,
             },
-          }
-        );
+          },
+        )
       }
-    }, sectionRef);
+    }, sectionRef)
 
     return () => {
-      ctx.revert();
-    };
-  }, []);
+      ctx.revert()
+    }
+  }, [])
 
   return (
     <section
@@ -150,10 +145,7 @@ export const Section2Statement: React.FC<Section2StatementProps> = ({
         ref={underneathWordmarkRef}
         className="relative w-full max-w-7xl mx-auto px-4 sm:px-8 pt-4 sm:pt-8 text-center z-10"
       >
-        <Wordmark
-          colorClass="text-[#C41528]"
-          charClassName="underneath-char"
-        />
+        <Wordmark colorClass="text-[#C41528]" charClassName="underneath-char" />
 
         {/* BIG LIVE PORTAL BUTTON DIRECTLY BELOW BENEFIT BRIDGE */}
         <div className="mt-8 sm:mt-10 mb-2 flex justify-center items-center z-20">
@@ -162,7 +154,9 @@ export const Section2Statement: React.FC<Section2StatementProps> = ({
             className="min-h-[56px] sm:min-h-[64px] px-8 sm:px-14 py-4 rounded-2xl bg-[#C41528] hover:bg-[#8E1B2B] !text-white text-base sm:text-xl font-bold tracking-tight shadow-[0_16px_36px_rgba(196,21,40,0.28)] hover:shadow-[0_20px_48px_rgba(196,21,40,0.42)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3.5 group cursor-pointer border border-[#C41528]"
           >
             <span className="w-3 h-3 rounded-full bg-white animate-pulse" />
-            <span className="!text-white font-bold tracking-normal">Launch Citizen Welfare Portal</span>
+            <span className="!text-white font-bold tracking-normal">
+              Launch Citizen Welfare Portal
+            </span>
             <span className="!text-white text-xl sm:text-2xl transition-transform group-hover:translate-x-1.5 font-bold">
               →
             </span>
@@ -189,7 +183,7 @@ export const Section2Statement: React.FC<Section2StatementProps> = ({
           {/* Masked Line 1 */}
           <div className="overflow-hidden py-1">
             <div className="headline-line will-change-transform">
-              Welfare isn't failing
+              {"Welfare isn't failing"}
             </div>
           </div>
 
@@ -203,7 +197,7 @@ export const Section2Statement: React.FC<Section2StatementProps> = ({
           {/* Masked Line 3 with Instrument Serif Italic */}
           <div className="overflow-hidden py-1">
             <div className="headline-line will-change-transform">
-              It's failing at the{" "}
+              {"It's failing at the"}{" "}
               <i className="font-serif-italic font-normal italic text-[#C41528] tracking-normal inline-block ml-1">
                 last mile of paperwork.
               </i>
@@ -342,7 +336,7 @@ export const Section2Statement: React.FC<Section2StatementProps> = ({
                     <span>⚠ Phonetic Spelling Variation</span>
                   </div>
                   <p className="text-[10px] text-[#8E1B2B]/85 leading-relaxed font-light">
-                    "Sunitha" vs "Sunita" on Ration Card. Correcting now guarantees immediate Direct Benefit Transfer (DBT).
+                    {"\"Sunitha\" vs \"Sunita\" on Ration Card. Correcting now guarantees immediate Direct Benefit Transfer (DBT)."}
                   </p>
                 </div>
 
@@ -457,8 +451,7 @@ export const Section2Statement: React.FC<Section2StatementProps> = ({
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default Section2Statement;
-
+export default Section2Statement

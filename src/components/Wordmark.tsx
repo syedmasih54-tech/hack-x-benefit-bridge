@@ -1,9 +1,9 @@
-import React from "react";
+import React from "react"
 
 interface WordmarkProps {
-  colorClass: string;
-  containerClassName?: string;
-  charClassName?: string;
+  colorClass: string
+  containerClassName?: string
+  charClassName?: string
 }
 
 export const Wordmark: React.FC<WordmarkProps> = ({
@@ -11,8 +11,8 @@ export const Wordmark: React.FC<WordmarkProps> = ({
   containerClassName = "",
   charClassName = "wordmark-char",
 }) => {
-  const line1 = ["B", "E", "N", "E", "F", "I", "T"];
-  const line2 = ["B", "R", "I", "D", "G", "E"];
+  const line1 = ["B", "E", "N", "E", "F", "I", "T"]
+  const line2 = ["B", "R", "I", "D", "G", "E"]
 
   return (
     <div
@@ -51,8 +51,7 @@ export const Wordmark: React.FC<WordmarkProps> = ({
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Wordmark;
-
+export default Wordmark
