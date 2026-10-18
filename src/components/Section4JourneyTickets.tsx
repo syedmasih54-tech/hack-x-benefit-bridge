@@ -508,8 +508,6 @@ export const Section4JourneyTickets: React.FC = () => {
                   <div className="pt-2 animate-fadeIn">
                     <a
                       href={getPortalUrl()}
-                      target="_blank"
-                      rel="noreferrer"
                       onClick={(e) => e.stopPropagation()}
                       className="min-h-[44px] w-full px-4 py-2.5 rounded-xl bg-[#C41528] hover:bg-[#8E1B2B] text-white text-xs font-bold transition-all shadow-md inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-98"
                     >

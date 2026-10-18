@@ -159,8 +159,6 @@ export const Section2Statement: React.FC<Section2StatementProps> = ({
         <div className="mt-8 sm:mt-10 mb-2 flex justify-center items-center z-20">
           <a
             href={getPortalUrl()}
-            target="_blank"
-            rel="noreferrer"
             className="min-h-[56px] sm:min-h-[64px] px-8 sm:px-14 py-4 rounded-2xl bg-[#C41528] hover:bg-[#8E1B2B] !text-white text-base sm:text-xl font-bold tracking-tight shadow-[0_16px_36px_rgba(196,21,40,0.28)] hover:shadow-[0_20px_48px_rgba(196,21,40,0.42)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3.5 group cursor-pointer border border-[#C41528]"
           >
             <span className="w-3 h-3 rounded-full bg-white animate-pulse" />

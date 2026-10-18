@@ -38,12 +38,12 @@
     <div class="brand-red-bar"></div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#C41528] to-[#EF4444] text-white flex items-center justify-center font-black text-xl shadow-md shadow-red-600/20">
+        <a href="/" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#C41528] to-[#EF4444] text-white flex items-center justify-center font-black text-xl shadow-md shadow-red-600/20 hover:scale-105 transition-transform cursor-pointer" title="Back to Overview">
           B
-        </div>
+        </a>
         <div>
           <div class="flex items-center space-x-2">
-            <span class="text-xl font-black tracking-tight text-slate-900">Benefit<span class="text-[#C41528]">Bridge</span></span>
+            <a href="/" class="text-xl font-black tracking-tight text-slate-900 hover:text-[#C41528] transition cursor-pointer" title="Back to Overview">Benefit<span class="text-[#C41528]">Bridge</span></a>
             <span class="text-xs bg-red-50 text-[#C41528] font-bold px-2.5 py-0.5 rounded-full border border-red-200">Live Civic Portal</span>
           </div>
           <p class="text-xs text-slate-500 font-medium">जन कल्याण सेतु &bull; Indian Citizen Welfare Assistance Layer</p>
@@ -52,6 +52,9 @@
 
       <!-- Navigation Tabs -->
       <nav class="flex items-center bg-slate-100 p-1 rounded-xl text-sm font-semibold space-x-1" id="navTabs">
+        <a href="/" class="tab-btn px-3 py-2 rounded-lg transition-all text-slate-700 hover:text-[#C41528] hover:bg-white flex items-center gap-1.5 font-bold cursor-pointer" title="Return to Overview Landing Page">
+          <i data-lucide="arrow-left" class="w-4 h-4 text-[#C41528]"></i> Overview
+        </a>
         <button onclick="switchTab('eligibility')" id="tab-eligibility" class="tab-btn px-4 py-2 rounded-lg transition-all text-[#C41528] bg-white shadow-xs border border-red-100 flex items-center gap-1.5 font-bold">
           <i data-lucide="compass" class="w-4 h-4 text-[#C41528]"></i> Scheme Eligibility
         </button>

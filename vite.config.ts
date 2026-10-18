@@ -38,6 +38,64 @@ export default defineConfig(({ mode }) => {
       watch: {
         ignored: ["**/.figma/**"],
       },
+      proxy: {
+        "/portal": {
+          target: "http://127.0.0.1:8000",
+          changeOrigin: true,
+        },
+        "/static": {
+          target: "http://127.0.0.1:8000",
+          changeOrigin: true,
+        },
+        "/auth": {
+          target: "http://127.0.0.1:8000",
+          changeOrigin: true,
+        },
+        "/schemes": {
+          target: "http://127.0.0.1:8000",
+          changeOrigin: true,
+        },
+        "/citizens": {
+          target: "http://127.0.0.1:8000",
+          changeOrigin: true,
+        },
+        "/eligibility": {
+          target: "http://127.0.0.1:8000",
+          changeOrigin: true,
+        },
+        "/documents": {
+          target: "http://127.0.0.1:8000",
+          changeOrigin: true,
+        },
+        "/applications": {
+          target: "http://127.0.0.1:8000",
+          changeOrigin: true,
+        },
+        "/grievances": {
+          target: "http://127.0.0.1:8000",
+          changeOrigin: true,
+        },
+        "/voice": {
+          target: "http://127.0.0.1:8000",
+          changeOrigin: true,
+        },
+        "/health": {
+          target: "http://127.0.0.1:8000",
+          changeOrigin: true,
+        },
+        "/docs": {
+          target: "http://127.0.0.1:8000",
+          changeOrigin: true,
+        },
+        "/openapi.json": {
+          target: "http://127.0.0.1:8000",
+          changeOrigin: true,
+        },
+        "/redoc": {
+          target: "http://127.0.0.1:8000",
+          changeOrigin: true,
+        },
+      },
     },
     preview: {
       host: process.env.FIGMA_DEV_SERVER_HOST || "0.0.0.0",
