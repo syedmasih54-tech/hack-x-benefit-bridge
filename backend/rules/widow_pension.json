@@ -1,62 +1,62 @@
 {
-  "scheme_id": "widow_pension",
-  "title": "Indira Gandhi National Widow Pension Scheme (IGNWPS)",
-  "description": "Financial assistance pension provided to widows living below the poverty line or in low-income households.",
-  "state_or_level": "Central / State Sponsored",
-  "ministry_or_department": "Ministry of Rural Development, Govt of India / National Social Assistance Programme (NSAP)",
-  "processing_deadline_days": 30,
-  "official_portal_url": "https://nsap.dord.gov.in",
-  "official_guidelines_url": "https://nsap.dord.gov.in/Guidelines/National_Social_Assistance_Programme_Guidelines.pdf",
-  "citizen_charter_clause": "Mandated under State Right to Public Services Act, Sec 4 & NSAP Citizen's Charter (Statutory SLA: 30 days)",
-  "rule_version": "v1.4.0",
-  "source_reference": "National Social Assistance Programme (NSAP) Operational Guidelines, Ministry of Rural Development, Govt of India",
-  "eligibility_rules": {
-    "min_age": 40,
-    "max_age": 79,
-    "gender": [
-      "female"
-    ],
-    "marital_status": [
-      "widow"
-    ],
-    "income_limit": 200000,
-    "occupation": [
-      "any"
-    ],
-    "disability_status": "any",
-    "required_documents": [
-      "ration_card",
-      "bank_passbook",
-      "death_certificate_of_husband",
-      "income_certificate"
-    ]
-  },
-  "documents_required": [
-    {
-      "code": "ration_card",
-      "name": "Ration Card (BPL / Antyodaya / Priority)",
-      "mandatory": true
-    },
-    {
-      "code": "bank_passbook",
-      "name": "Bank Passbook with Active Account Number & IFSC",
-      "mandatory": true
-    },
-    {
-      "code": "death_certificate_of_husband",
-      "name": "Death Certificate of Husband",
-      "mandatory": true
-    },
-    {
-      "code": "income_certificate",
-      "name": "Income Certificate issued by Revenue Authority / Tehsildar",
-      "mandatory": true
-    }
-  ],
-  "last_synced_at": "2026-10-14T05:22:02.397836+00:00",
-  "last_verified_date": "14-Oct-2026",
-  "is_live_source": true,
-  "is_live_data_source": true,
-  "official_source_name": "Ministry of Rural Development, Govt of India / National Social Assistance Programme (NSAP)",
-  "source_gazette_or_guideline_url": "https://nsap.dord.gov.in/Guidelines/National_Social_Assistance_Programme_Guidelines.pdf"
+    "scheme_id":  "widow_pension",
+    "title":  "Indira Gandhi National Widow Pension Scheme (IGNWPS)",
+    "description":  "Financial assistance pension provided to widows living below the poverty line or in low-income households.",
+    "state_or_level":  "Central / State Sponsored",
+    "ministry_or_department":  "Ministry of Rural Development, Govt of India / National Social Assistance Programme (NSAP)",
+    "processing_deadline_days":  30,
+    "official_portal_url":  "https://nsap.dord.gov.in",
+    "official_guidelines_url":  "https://nsap.dord.gov.in/Guidelines/National_Social_Assistance_Programme_Guidelines.pdf",
+    "citizen_charter_clause":  "Mandated under State Right to Public Services Act, Sec 4 \u0026 NSAP Citizen\u0027s Charter (Statutory SLA: 30 days)",
+    "rule_version":  "v1.4.0",
+    "source_reference":  "National Social Assistance Programme (NSAP) Operational Guidelines, Ministry of Rural Development, Govt of India",
+    "eligibility_rules":  {
+                              "min_age":  40,
+                              "max_age":  79,
+                              "gender":  [
+                                             "female"
+                                         ],
+                              "marital_status":  [
+                                                     "widow"
+                                                 ],
+                              "income_limit":  200000,
+                              "occupation":  [
+                                                 "any"
+                                             ],
+                              "disability_status":  "any",
+                              "required_documents":  [
+                                                         "ration_card",
+                                                         "bank_passbook",
+                                                         "death_certificate_of_husband",
+                                                         "income_certificate"
+                                                     ]
+                          },
+    "documents_required":  [
+                               {
+                                   "code":  "ration_card",
+                                   "name":  "Ration Card (BPL / Antyodaya / Priority)",
+                                   "mandatory":  true
+                               },
+                               {
+                                   "code":  "bank_passbook",
+                                   "name":  "Bank Passbook with Active Account Number \u0026 IFSC",
+                                   "mandatory":  true
+                               },
+                               {
+                                   "code":  "death_certificate_of_husband",
+                                   "name":  "Death Certificate of Husband",
+                                   "mandatory":  true
+                               },
+                               {
+                                   "code":  "income_certificate",
+                                   "name":  "Income Certificate issued by Revenue Authority / Tehsildar",
+                                   "mandatory":  true
+                               }
+                           ],
+    "last_synced_at":  "2026-10-14T05:22:02.397836+00:00",
+    "last_verified_date":  null,
+    "is_live_source":  false,
+    "is_live_data_source":  false,
+    "official_source_name":  "Ministry of Rural Development, Govt of India / National Social Assistance Programme (NSAP)",
+    "source_gazette_or_guideline_url":  "https://nsap.dord.gov.in/Guidelines/National_Social_Assistance_Programme_Guidelines.pdf"
 }

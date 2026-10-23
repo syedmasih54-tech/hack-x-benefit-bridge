@@ -122,6 +122,7 @@ class CitizenCreate(CitizenBase):
 class CitizenResponse(CitizenBase):
     id: str
     created_at: datetime
+    access_token: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -174,13 +175,13 @@ class SchemeDetail(BaseModel):
     official_guidelines_url: Optional[str] = Field(default=None, description="Official operational guideline or gazette URL")
     citizen_charter_clause: Optional[str] = Field(default=None, description="Statutory citizen charter / public services guarantee clause")
     last_synced_at: Optional[datetime] = Field(default=None, description="UTC timestamp of last live sync")
-    is_live_source: bool = Field(default=True, description="True if verified and synced from live external source")
+    is_live_source: bool = Field(default=False, description="True only when scheme rules were fetched and verified from a live source")
 
     # Backward compatibility attributes
     official_source_name: str = Field(default="", description="Official government source authority")
     source_gazette_or_guideline_url: str = Field(default="", description="Authentic operational guideline or gazette URL")
-    last_verified_date: str = Field(default="14-Oct-2026", description="Last verified date against official portal (DD-Mon-YYYY)")
-    is_live_data_source: bool = Field(default=True, description="True if verified and synced from external portal")
+    last_verified_date: Optional[str] = Field(default=None, description="Date the scheme rules were last verified against an official source")
+    is_live_data_source: bool = Field(default=False, description="True only when scheme rules were fetched and verified from a live source")
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -192,10 +193,10 @@ class SchemeDetail(BaseModel):
             guideline = getattr(data, "official_guidelines_url", None) or getattr(data, "source_gazette_or_guideline_url", None) or getattr(data, "official_portal_url", "")
             is_live = getattr(data, "is_live_source", None)
             if is_live is None:
-                is_live = getattr(data, "is_live_data_source", True)
+                is_live = getattr(data, "is_live_data_source", False)
             last_synced = getattr(data, "last_synced_at", None) or datetime.now()
             last_verified = getattr(data, "last_verified_date", None)
-            if not last_verified and isinstance(last_synced, datetime):
+            if not last_verified and bool(is_live) and isinstance(last_synced, datetime):
                 last_verified = last_synced.strftime("%d-%b-%Y")
             d = {k: v for k, v in data.__dict__.items() if not k.startswith("_")}
             d["ministry_or_department"] = ministry
@@ -205,14 +206,14 @@ class SchemeDetail(BaseModel):
             d["is_live_source"] = bool(is_live)
             d["is_live_data_source"] = bool(is_live)
             d["last_synced_at"] = last_synced
-            d["last_verified_date"] = last_verified or "14-Oct-2026"
+            d["last_verified_date"] = last_verified
             return d
         elif isinstance(data, dict):
             ministry = data.get("ministry_or_department") or data.get("official_source_name") or "Official Government Authority"
             guideline = data.get("official_guidelines_url") or data.get("source_gazette_or_guideline_url") or data.get("official_portal_url", "")
             is_live = data.get("is_live_source")
             if is_live is None:
-                is_live = data.get("is_live_data_source", True)
+                is_live = data.get("is_live_data_source", False)
             data["ministry_or_department"] = ministry
             data["official_source_name"] = ministry
             data["official_guidelines_url"] = guideline
@@ -222,10 +223,10 @@ class SchemeDetail(BaseModel):
             if "last_synced_at" not in data or data["last_synced_at"] is None:
                 data["last_synced_at"] = datetime.now()
             if "last_verified_date" not in data or not data["last_verified_date"]:
-                if isinstance(data["last_synced_at"], datetime):
+                if bool(is_live) and isinstance(data.get("last_synced_at"), datetime):
                     data["last_verified_date"] = data["last_synced_at"].strftime("%d-%b-%Y")
                 else:
-                    data["last_verified_date"] = "14-Oct-2026"
+                    data["last_verified_date"] = None
         return data
 
 
@@ -241,13 +242,13 @@ class SchemeSummary(BaseModel):
     official_guidelines_url: Optional[str] = Field(default=None, description="Official operational guideline or gazette URL")
     citizen_charter_clause: Optional[str] = Field(default=None, description="Statutory citizen charter / public services guarantee clause")
     last_synced_at: Optional[datetime] = Field(default=None, description="UTC timestamp of last live sync")
-    is_live_source: bool = Field(default=True, description="True if verified and synced from live external source")
+    is_live_source: bool = Field(default=False, description="True only if verified against a live external source")
 
     # Backward compatibility attributes
     official_source_name: str = Field(default="", description="Official government source authority")
     source_gazette_or_guideline_url: str = Field(default="", description="Authentic operational guideline or gazette URL")
-    last_verified_date: str = Field(default="14-Oct-2026", description="Last verified date against official portal (DD-Mon-YYYY)")
-    is_live_data_source: bool = Field(default=True, description="True if verified and synced from external portal")
+    last_verified_date: Optional[str] = Field(default=None, description="Date verified against official portal (DD-Mon-YYYY)")
+    is_live_data_source: bool = Field(default=False, description="True only if verified against a live external source")
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -259,8 +260,8 @@ class SchemeSummary(BaseModel):
             guideline = getattr(data, "official_guidelines_url", None) or getattr(data, "source_gazette_or_guideline_url", None) or getattr(data, "official_portal_url", "")
             is_live = getattr(data, "is_live_source", None)
             if is_live is None:
-                is_live = getattr(data, "is_live_data_source", True)
-            last_synced = getattr(data, "last_synced_at", None) or datetime.now()
+                is_live = getattr(data, "is_live_data_source", False)
+            last_synced = getattr(data, "last_synced_at", None)
             last_verified = getattr(data, "last_verified_date", None)
             if not last_verified and isinstance(last_synced, datetime):
                 last_verified = last_synced.strftime("%d-%b-%Y")
@@ -272,27 +273,25 @@ class SchemeSummary(BaseModel):
             d["is_live_source"] = bool(is_live)
             d["is_live_data_source"] = bool(is_live)
             d["last_synced_at"] = last_synced
-            d["last_verified_date"] = last_verified or "14-Oct-2026"
+            d["last_verified_date"] = last_verified
             return d
         elif isinstance(data, dict):
             ministry = data.get("ministry_or_department") or data.get("official_source_name") or "Official Government Authority"
             guideline = data.get("official_guidelines_url") or data.get("source_gazette_or_guideline_url") or data.get("official_portal_url", "")
             is_live = data.get("is_live_source")
             if is_live is None:
-                is_live = data.get("is_live_data_source", True)
+                is_live = data.get("is_live_data_source", False)
             data["ministry_or_department"] = ministry
             data["official_source_name"] = ministry
             data["official_guidelines_url"] = guideline
             data["source_gazette_or_guideline_url"] = guideline
             data["is_live_source"] = bool(is_live)
             data["is_live_data_source"] = bool(is_live)
-            if "last_synced_at" not in data or data["last_synced_at"] is None:
-                data["last_synced_at"] = datetime.now()
             if "last_verified_date" not in data or not data["last_verified_date"]:
                 if isinstance(data["last_synced_at"], datetime):
                     data["last_verified_date"] = data["last_synced_at"].strftime("%d-%b-%Y")
                 else:
-                    data["last_verified_date"] = "14-Oct-2026"
+                    data["last_verified_date"] = None
         return data
 
 
@@ -315,12 +314,12 @@ class LiveSyncResponse(BaseModel):
 
 # ---------------- Eligibility Check Schemas ----------------
 class CitizenProfile(BaseModel):
-    age: int = Field(..., ge=0, le=130, description="Age in completed years")
-    gender: str = Field(..., description="'female', 'male', or 'other'")
-    marital_status: str = Field(..., description="'widow', 'married', 'unmarried', 'divorced', etc.")
+    age: Optional[int] = Field(default=None, ge=0, le=130, description="Age in completed years, if known")
+    gender: Optional[str] = Field(default=None, description="'female', 'male', or 'other', if known")
+    marital_status: Optional[str] = Field(default=None, description="Marital status, if known")
     annual_income: float = Field(default=0.0, ge=0.0, description="Total annual household income in INR")
-    occupation: str = Field(..., description="Occupation: 'homemaker', 'student', 'farmer', 'daily_wage', 'unemployed', etc.")
-    disability_status: str = Field(default="none", description="'none', 'yes', or percentage/type")
+    occupation: Optional[str] = Field(default=None, description="Occupation, if known")
+    disability_status: Optional[str] = Field(default=None, description="'none', 'yes', or percentage/type, if known")
     available_documents: List[str] = Field(
         default_factory=list,
         description="List of document codes held by citizen, e.g. ['ration_card', 'bank_passbook']"
@@ -335,7 +334,8 @@ class CitizenProfile(BaseModel):
 class VoiceIntakeRequest(BaseModel):
     raw_transcript: str = Field(..., description="Speech-to-text input transcript from citizen")
     audio_language: Optional[str] = Field(default=None, description="Optional audio language: 'hi-IN', 'en-IN'")
-    citizen_id: Optional[str] = Field(default=None, description="Optional associated citizen ID")
+    citizen_id: str = Field(..., description="Authenticated citizen record receiving this intake")
+    consent_given: bool = Field(default=False, description="Explicit consent to process and retain this voice intake")
 
 
 class VoiceIntakeResponse(BaseModel):
@@ -352,6 +352,8 @@ class VoiceApplySchemeResponse(BaseModel):
     scheme_id: Optional[str] = Field(default=None, description="Target welfare scheme ID applied for")
     status: str = Field(default="submitted", description="Application status: 'submitted' or 'ineligible'")
     confirmation_message: str = Field(..., description="Bilingual audio/text feedback string")
+    citizen_id: Optional[str] = None
+    access_token: Optional[str] = None
 
 
 class EligibilityCheckRequest(BaseModel):
@@ -373,6 +375,7 @@ class SchemeEvaluationResult(BaseModel):
     matched_rules: List[str]
     failed_rules: List[str]
     missing_documents: List[str]
+    missing_information: List[str] = Field(default_factory=list)
     simple_explanation: str
     rule_version: str
     official_portal_url: str
@@ -436,7 +439,7 @@ class DocumentCompareResponse(BaseModel):
 class ApplicationCreateRequest(BaseModel):
     citizen_id: str
     scheme_id: str
-    consent_given: bool = True
+    consent_given: bool = False
     status: str = "submitted"
     custom_submitted_at: Optional[datetime] = Field(
         default=None,
@@ -537,7 +540,7 @@ class DigiLockerDocumentItem(BaseModel):
     doc_name: str = Field(..., description="Display title of the issued certificate")
     issuer: str = Field(..., description="Authentic government issuing authority name")
     uri: str = Field(..., description="Official DigiLocker URI schema string")
-    verified: bool = Field(default=True, description="DigiLocker cryptographic digital signature status")
+    verified: bool = Field(default=False, description="True only when the credential signature has been verified")
     extracted_data: Optional[Dict[str, Any]] = Field(default=None, description="Extracted XML/JSON metadata attributes")
     fetched_at: Optional[datetime] = None
 
@@ -547,7 +550,7 @@ class DigiLockerDocumentItem(BaseModel):
 class DigiLockerCallbackResponse(BaseModel):
     citizen_id: str = Field(..., description="BenefitBridge Citizen unique identifier")
     full_name: str = Field(..., description="Citizen verified name from DigiLocker")
-    digilocker_verified: bool = Field(default=True, description="National SSO verified identity flag")
+    digilocker_verified: bool = Field(default=False, description="True only when identity was verified by National SSO")
     verified_documents: List[str] = Field(default_factory=list, description="List of verified document names pulled from DigiLocker")
     eligibility_status: str = Field(default="eligible", description="'eligible', 'partially_eligible', or 'ineligible'")
     application_id: Optional[str] = Field(default=None, description="Generated tracked application token (e.g., APP-XXXXXX)")
@@ -555,10 +558,12 @@ class DigiLockerCallbackResponse(BaseModel):
     statutory_deadline_days: int = Field(default=30, description="Guaranteed statutory SLA processing days")
     expected_resolution_date: str = Field(default="", description="Target resolution date under citizen charter")
     confirmation_message: str = Field(default="", description="Citizen-friendly feedback explaining the result and SLA guarantee")
+    demo_mode: bool = Field(default=False, description="True when this response uses synthetic demonstration data")
+    access_token: Optional[str] = Field(default=None, description="Short lived citizen session token")
 
     # Compatibility fields for legacy and extended API consumers
     status: Optional[str] = Field(default="success", description="'success' or 'ineligible'")
-    is_verified: Optional[bool] = Field(default=True, description="DigiLocker verification flag")
+    is_verified: Optional[bool] = Field(default=False, description="True only when DigiLocker verification completed")
     fetched_documents_count: Optional[int] = Field(default=0, description="Number of issued credentials pulled and verified")
     status_message: Optional[str] = Field(default="", description="Detailed status message")
     eligible_schemes_count: Optional[int] = Field(default=0, description="Total matching schemes count")

@@ -1,56 +1,56 @@
 {
-  "scheme_id": "old_age_pension",
-  "title": "Indira Gandhi National Old Age Pension Scheme (IGNOAPS)",
-  "description": "Non-contributory monthly pension providing social security to elderly citizens living below poverty line.",
-  "state_or_level": "Central / State Sponsored",
-  "ministry_or_department": "Ministry of Rural Development, Govt of India / National Social Assistance Programme (NSAP)",
-  "processing_deadline_days": 45,
-  "official_portal_url": "https://nsap.dord.gov.in",
-  "official_guidelines_url": "https://nsap.dord.gov.in/Guidelines/National_Social_Assistance_Programme_Guidelines.pdf",
-  "citizen_charter_clause": "Statutory SLA under NSAP Citizen's Charter & State Right to Public Services Act (Statutory SLA: 45 days)",
-  "rule_version": "v1.4.0",
-  "source_reference": "National Social Assistance Programme (NSAP) Operational Guidelines, Ministry of Rural Development, Govt of India",
-  "eligibility_rules": {
-    "min_age": 60,
-    "max_age": 120,
-    "gender": [
-      "all"
-    ],
-    "marital_status": [
-      "all"
-    ],
-    "income_limit": 200000,
-    "occupation": [
-      "any"
-    ],
-    "disability_status": "any",
-    "required_documents": [
-      "ration_card",
-      "bank_passbook",
-      "income_certificate"
-    ]
-  },
-  "documents_required": [
-    {
-      "code": "ration_card",
-      "name": "Ration Card (BPL / Antyodaya / Priority)",
-      "mandatory": true
-    },
-    {
-      "code": "bank_passbook",
-      "name": "Bank Passbook with Active DBT Account",
-      "mandatory": true
-    },
-    {
-      "code": "income_certificate",
-      "name": "Income Certificate issued by Tehsildar / Sub-Divisional Magistrate",
-      "mandatory": true
-    }
-  ],
-  "last_synced_at": "2026-10-14T05:22:02.397836+00:00",
-  "last_verified_date": "14-Oct-2026",
-  "is_live_source": true,
-  "is_live_data_source": true,
-  "official_source_name": "Ministry of Rural Development, Govt of India / National Social Assistance Programme (NSAP)",
-  "source_gazette_or_guideline_url": "https://nsap.dord.gov.in/Guidelines/National_Social_Assistance_Programme_Guidelines.pdf"
+    "scheme_id":  "old_age_pension",
+    "title":  "Indira Gandhi National Old Age Pension Scheme (IGNOAPS)",
+    "description":  "Non-contributory monthly pension providing social security to elderly citizens living below poverty line.",
+    "state_or_level":  "Central / State Sponsored",
+    "ministry_or_department":  "Ministry of Rural Development, Govt of India / National Social Assistance Programme (NSAP)",
+    "processing_deadline_days":  45,
+    "official_portal_url":  "https://nsap.dord.gov.in",
+    "official_guidelines_url":  "https://nsap.dord.gov.in/Guidelines/National_Social_Assistance_Programme_Guidelines.pdf",
+    "citizen_charter_clause":  "Statutory SLA under NSAP Citizen\u0027s Charter \u0026 State Right to Public Services Act (Statutory SLA: 45 days)",
+    "rule_version":  "v1.4.0",
+    "source_reference":  "National Social Assistance Programme (NSAP) Operational Guidelines, Ministry of Rural Development, Govt of India",
+    "eligibility_rules":  {
+                              "min_age":  60,
+                              "max_age":  120,
+                              "gender":  [
+                                             "all"
+                                         ],
+                              "marital_status":  [
+                                                     "all"
+                                                 ],
+                              "income_limit":  200000,
+                              "occupation":  [
+                                                 "any"
+                                             ],
+                              "disability_status":  "any",
+                              "required_documents":  [
+                                                         "ration_card",
+                                                         "bank_passbook",
+                                                         "income_certificate"
+                                                     ]
+                          },
+    "documents_required":  [
+                               {
+                                   "code":  "ration_card",
+                                   "name":  "Ration Card (BPL / Antyodaya / Priority)",
+                                   "mandatory":  true
+                               },
+                               {
+                                   "code":  "bank_passbook",
+                                   "name":  "Bank Passbook with Active DBT Account",
+                                   "mandatory":  true
+                               },
+                               {
+                                   "code":  "income_certificate",
+                                   "name":  "Income Certificate issued by Tehsildar / Sub-Divisional Magistrate",
+                                   "mandatory":  true
+                               }
+                           ],
+    "last_synced_at":  "2026-10-14T05:22:02.397836+00:00",
+    "last_verified_date":  null,
+    "is_live_source":  false,
+    "is_live_data_source":  false,
+    "official_source_name":  "Ministry of Rural Development, Govt of India / National Social Assistance Programme (NSAP)",
+    "source_gazette_or_guideline_url":  "https://nsap.dord.gov.in/Guidelines/National_Social_Assistance_Programme_Guidelines.pdf"
 }

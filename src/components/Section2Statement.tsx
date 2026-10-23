@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import Wordmark from "./Wordmark"
@@ -20,6 +20,7 @@ export const Section2Statement: React.FC<Section2StatementProps> = ({
   const card1Ref = useRef<HTMLDivElement | null>(null)
   const card2Ref = useRef<HTMLDivElement | null>(null)
   const card3Ref = useRef<HTMLDivElement | null>(null)
+  const [showVarianceInfo, setShowVarianceInfo] = useState(false)
 
   useEffect(() => {
     // Check reduced motion preference
@@ -302,9 +303,17 @@ export const Section2Statement: React.FC<Section2StatementProps> = ({
                     Primary Savings Passbook
                   </h4>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-white/90 border border-[#8E1B2B]/20 flex items-center justify-center text-[#8E1B2B] shadow-xs">
+                <button
+                  type="button"
+                  aria-label="More information about the name variation"
+                  aria-expanded={showVarianceInfo}
+                  aria-controls="name-variance-info"
+                  onClick={() => setShowVarianceInfo((shown) => !shown)}
+                  className="group/icon relative w-10 h-10 rounded-full bg-white/45 backdrop-blur-xl border border-white/80 flex items-center justify-center text-[#8E1B2B] shadow-[0_6px_18px_rgba(142,27,43,0.12),inset_0_1px_0_rgba(255,255,255,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/75 hover:shadow-[0_10px_24px_rgba(142,27,43,0.2),inset_0_1px_0_rgba(255,255,255,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C41528]/50"
+                >
+                  <span className="absolute inset-0 rounded-full bg-gradient-to-br from-white/70 to-transparent opacity-80 pointer-events-none" />
                   <svg
-                    className="w-4 h-4"
+                    className="interactive-icon relative w-4 h-4 transition-transform duration-300 group-hover/icon:scale-110"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -316,8 +325,20 @@ export const Section2Statement: React.FC<Section2StatementProps> = ({
                       d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
                     />
                   </svg>
-                </div>
+                  <span className="sr-only">Toggle explanation</span>
+                </button>
               </div>
+
+              {showVarianceInfo && (
+                <div
+                  id="name-variance-info"
+                  role="status"
+                  className="mb-4 rounded-2xl border border-white/80 bg-white/55 px-4 py-3 text-[11px] leading-relaxed text-[#5C2930] shadow-[0_10px_28px_rgba(26,15,18,0.08),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl animate-in fade-in duration-200"
+                >
+                  A small spelling difference can delay identity checks. Confirm
+                  the preferred spelling before submitting the benefit claim.
+                </div>
+              )}
 
               {/* Account Data & Discrepancy Highlight */}
               <div className="space-y-3 text-xs">

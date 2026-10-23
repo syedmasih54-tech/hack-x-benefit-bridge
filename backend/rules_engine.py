@@ -57,15 +57,19 @@ def evaluate_single_scheme(profile: CitizenProfile, rule_data: dict) -> SchemeEv
 
     matched_rules: List[str] = []
     failed_rules: List[str] = []
+    missing_information: List[str] = []
 
     # 1. Age Evaluation
     min_age = rules.get("min_age")
     max_age = rules.get("max_age")
-    if min_age is not None and profile.age < min_age:
+    if profile.age is None:
+        if min_age is not None or max_age is not None:
+            missing_information.append("Age")
+    elif min_age is not None and profile.age < min_age:
         failed_rules.append(f"Age requirement not met: age {profile.age} is below minimum required age of {min_age} years.")
     elif max_age is not None and profile.age > max_age:
         failed_rules.append(f"Age requirement not met: age {profile.age} exceeds maximum allowable age of {max_age} years.")
-    else:
+    elif profile.age is not None:
         age_str = f"Age {profile.age} meets criteria"
         if min_age is not None and max_age is not None:
             age_str += f" ({min_age}-{max_age} years)"
@@ -77,6 +81,8 @@ def evaluate_single_scheme(profile: CitizenProfile, rule_data: dict) -> SchemeEv
     allowed_genders = [g.lower() for g in rules.get("gender", ["all"])]
     if "all" in allowed_genders or "any" in allowed_genders:
         matched_rules.append("Gender: open to all genders")
+    elif not profile.gender or profile.gender.lower() == "unknown":
+        missing_information.append("Gender")
     elif profile.gender.lower() in allowed_genders:
         matched_rules.append(f"Gender: {profile.gender.capitalize()} matches scheme requirement ({', '.join(allowed_genders)})")
     else:
@@ -86,6 +92,8 @@ def evaluate_single_scheme(profile: CitizenProfile, rule_data: dict) -> SchemeEv
     allowed_marital = [m.lower() for m in rules.get("marital_status", ["all"])]
     if "all" in allowed_marital or "any" in allowed_marital:
         matched_rules.append("Marital status: open to all marital statuses")
+    elif not profile.marital_status or profile.marital_status.lower() == "unknown":
+        missing_information.append("Marital status")
     elif profile.marital_status.lower() in allowed_marital:
         matched_rules.append(f"Marital status: '{profile.marital_status}' matches scheme target group")
     else:
@@ -95,6 +103,8 @@ def evaluate_single_scheme(profile: CitizenProfile, rule_data: dict) -> SchemeEv
     income_limit = rules.get("income_limit")
     if income_limit is None:
         matched_rules.append("Income: no strict income ceiling specified")
+    elif profile.annual_income is None:
+        missing_information.append("Annual household income")
     elif profile.annual_income <= income_limit:
         matched_rules.append(f"Income: annual income ₹{profile.annual_income:,.0f} is within limit of ₹{income_limit:,.0f}")
     else:
@@ -105,6 +115,8 @@ def evaluate_single_scheme(profile: CitizenProfile, rule_data: dict) -> SchemeEv
     allowed_occupations = [o.lower() for o in rules.get("occupation", ["any"])]
     if "any" in allowed_occupations or "all" in allowed_occupations:
         matched_rules.append("Occupation: open to all occupations")
+    elif not profile.occupation or profile.occupation.lower() == "unknown":
+        missing_information.append("Occupation")
     elif profile.occupation.lower() in allowed_occupations:
         matched_rules.append(f"Occupation: '{profile.occupation}' qualifies under scheme criteria")
     else:
@@ -115,7 +127,9 @@ def evaluate_single_scheme(profile: CitizenProfile, rule_data: dict) -> SchemeEv
     if req_disability in ["any", "all", "none"]:
         matched_rules.append("Disability criteria: non-restrictive")
     else:
-        if profile.disability_status.lower() in ["none", "no", ""]:
+        if not profile.disability_status or profile.disability_status.lower() == "unknown":
+            missing_information.append("Disability status")
+        elif profile.disability_status.lower() in ["none", "no", ""]:
             failed_rules.append("Disability criterion not met: scheme is designated for citizens with documented disability.")
         else:
             matched_rules.append(f"Disability criteria met: {profile.disability_status}")
@@ -140,12 +154,15 @@ def evaluate_single_scheme(profile: CitizenProfile, rule_data: dict) -> SchemeEv
         explanation = (
             f"You are currently ineligible for {scheme_title} because: {reasons}."
         )
-    elif len(missing_docs) > 0:
+    elif len(missing_docs) > 0 or len(missing_information) > 0:
+        pending = []
+        if missing_information:
+            pending.append("confirm " + ", ".join(missing_information))
+        if missing_docs:
+            pending.append("arrange " + ", ".join(missing_docs))
         status = "partially_eligible"
         explanation = (
-            f"Great news! You meet all demographic and income criteria for {scheme_title}. "
-            f"However, before applying you still need to arrange {len(missing_docs)} missing document(s): "
-            f"{', '.join(missing_docs)}."
+            f"We can’t confirm eligibility for {scheme_title} yet. Please {' and '.join(pending)}."
         )
     else:
         status = "eligible"
@@ -161,6 +178,7 @@ def evaluate_single_scheme(profile: CitizenProfile, rule_data: dict) -> SchemeEv
         matched_rules=matched_rules,
         failed_rules=failed_rules,
         missing_documents=missing_docs,
+        missing_information=missing_information,
         simple_explanation=explanation,
         rule_version=rule_version,
         official_portal_url=portal_url,

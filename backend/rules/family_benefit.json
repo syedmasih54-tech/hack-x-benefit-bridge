@@ -1,62 +1,62 @@
 {
-  "scheme_id": "family_benefit",
-  "title": "National Family Benefit Scheme (NFBS)",
-  "description": "One-time lump sum assistance of ₹20,000 to the bereaved household on the untimely demise of the primary breadwinner.",
-  "state_or_level": "Central / State Sponsored",
-  "ministry_or_department": "Ministry of Rural Development, Govt of India / National Social Assistance Programme (NSAP)",
-  "processing_deadline_days": 30,
-  "official_portal_url": "https://nsap.dord.gov.in",
-  "official_guidelines_url": "https://nsap.dord.gov.in/Guidelines/National_Social_Assistance_Programme_Guidelines.pdf",
-  "citizen_charter_clause": "Statutory Service Guarantee under NSAP Citizen's Charter (Statutory SLA: 30 days)",
-  "rule_version": "v1.2.0",
-  "source_reference": "National Social Assistance Programme (NSAP) Operational Guidelines, Ministry of Rural Development, Govt of India",
-  "eligibility_rules": {
-    "min_age": 18,
-    "max_age": 59,
-    "gender": [
-      "all"
-    ],
-    "marital_status": [
-      "all"
-    ],
-    "income_limit": 200000,
-    "occupation": [
-      "any"
-    ],
-    "disability_status": "any",
-    "required_documents": [
-      "death_certificate_breadwinner",
-      "ration_card",
-      "bank_passbook",
-      "income_certificate"
-    ]
-  },
-  "documents_required": [
-    {
-      "code": "death_certificate_breadwinner",
-      "name": "Death Certificate of Primary Breadwinner (Age 18-59)",
-      "mandatory": true
-    },
-    {
-      "code": "ration_card",
-      "name": "BPL Ration Card / Household Identification",
-      "mandatory": true
-    },
-    {
-      "code": "bank_passbook",
-      "name": "Bank Passbook of Surviving Head of Family",
-      "mandatory": true
-    },
-    {
-      "code": "income_certificate",
-      "name": "BPL / Income Certificate",
-      "mandatory": true
-    }
-  ],
-  "last_synced_at": "2026-10-14T05:22:02.397836+00:00",
-  "last_verified_date": "14-Oct-2026",
-  "is_live_source": true,
-  "is_live_data_source": true,
-  "official_source_name": "Ministry of Rural Development, Govt of India / National Social Assistance Programme (NSAP)",
-  "source_gazette_or_guideline_url": "https://nsap.dord.gov.in/Guidelines/National_Social_Assistance_Programme_Guidelines.pdf"
+    "scheme_id":  "family_benefit",
+    "title":  "National Family Benefit Scheme (NFBS)",
+    "description":  "One-time lump sum assistance of â‚¹20,000 to the bereaved household on the untimely demise of the primary breadwinner.",
+    "state_or_level":  "Central / State Sponsored",
+    "ministry_or_department":  "Ministry of Rural Development, Govt of India / National Social Assistance Programme (NSAP)",
+    "processing_deadline_days":  30,
+    "official_portal_url":  "https://nsap.dord.gov.in",
+    "official_guidelines_url":  "https://nsap.dord.gov.in/Guidelines/National_Social_Assistance_Programme_Guidelines.pdf",
+    "citizen_charter_clause":  "Statutory Service Guarantee under NSAP Citizen\u0027s Charter (Statutory SLA: 30 days)",
+    "rule_version":  "v1.2.0",
+    "source_reference":  "National Social Assistance Programme (NSAP) Operational Guidelines, Ministry of Rural Development, Govt of India",
+    "eligibility_rules":  {
+                              "min_age":  18,
+                              "max_age":  59,
+                              "gender":  [
+                                             "all"
+                                         ],
+                              "marital_status":  [
+                                                     "all"
+                                                 ],
+                              "income_limit":  200000,
+                              "occupation":  [
+                                                 "any"
+                                             ],
+                              "disability_status":  "any",
+                              "required_documents":  [
+                                                         "death_certificate_breadwinner",
+                                                         "ration_card",
+                                                         "bank_passbook",
+                                                         "income_certificate"
+                                                     ]
+                          },
+    "documents_required":  [
+                               {
+                                   "code":  "death_certificate_breadwinner",
+                                   "name":  "Death Certificate of Primary Breadwinner (Age 18-59)",
+                                   "mandatory":  true
+                               },
+                               {
+                                   "code":  "ration_card",
+                                   "name":  "BPL Ration Card / Household Identification",
+                                   "mandatory":  true
+                               },
+                               {
+                                   "code":  "bank_passbook",
+                                   "name":  "Bank Passbook of Surviving Head of Family",
+                                   "mandatory":  true
+                               },
+                               {
+                                   "code":  "income_certificate",
+                                   "name":  "BPL / Income Certificate",
+                                   "mandatory":  true
+                               }
+                           ],
+    "last_synced_at":  "2026-10-14T05:22:02.397836+00:00",
+    "last_verified_date":  null,
+    "is_live_source":  false,
+    "is_live_data_source":  false,
+    "official_source_name":  "Ministry of Rural Development, Govt of India / National Social Assistance Programme (NSAP)",
+    "source_gazette_or_guideline_url":  "https://nsap.dord.gov.in/Guidelines/National_Social_Assistance_Programme_Guidelines.pdf"
 }

@@ -35,9 +35,6 @@ from sqlalchemy.orm import Session
 from database import SessionLocal, engine
 from models import Scheme, utc_now
 
-# Suppress unverified HTTPS warnings when hitting NIC servers with unbundled Indian root CAs
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
 logger = logging.getLogger("BenefitBridge.GovDataSync")
 logger.setLevel(logging.INFO)
 
@@ -114,7 +111,7 @@ VERIFIED_SCHEME_MIRRORS: Dict[str, Dict[str, Any]] = {
     "kisan_yojna": {
         "scheme_id": "kisan_yojna",
         "title": "Pradhan Mantri Kisan Samman Nidhi (PM-KISAN Yojna)",
-        "description": "Income support scheme providing ₹6,000 per year in three equal installments to farmer families with cultivable landholding.",
+        "description": "Income support scheme providing â‚¹6,000 per year in three equal installments to farmer families with cultivable landholding.",
         "state_or_level": "Central Sector Scheme, Ministry of Agriculture & Farmers Welfare",
         "ministry_or_department": "Department of Agriculture & Farmers Welfare, Ministry of Agriculture & Farmers Welfare, Govt of India",
         "processing_deadline_days": 30,
@@ -252,7 +249,7 @@ VERIFIED_SCHEME_MIRRORS: Dict[str, Dict[str, Any]] = {
     "family_benefit": {
         "scheme_id": "family_benefit",
         "title": "National Family Benefit Scheme (NFBS)",
-        "description": "One-time lump sum assistance of ₹20,000 to the bereaved household on the untimely demise of the primary breadwinner.",
+        "description": "One-time lump sum assistance of â‚¹20,000 to the bereaved household on the untimely demise of the primary breadwinner.",
         "state_or_level": "Central / State Sponsored",
         "ministry_or_department": "Ministry of Rural Development, Govt of India / National Social Assistance Programme (NSAP)",
         "processing_deadline_days": 30,
@@ -320,13 +317,9 @@ def polite_request(
             # First attempt with standard certificate verification
             resp = requests.get(url, headers=req_headers, timeout=timeout, verify=True)
             return resp
-        except (requests.exceptions.SSLError, urllib3.exceptions.SSLError):
-            # Fall back to verify=False for NIC/CCA intermediate certificate chains
-            try:
-                resp = requests.get(url, headers=req_headers, timeout=timeout, verify=False)
-                return resp
-            except Exception as e:
-                logger.warning(f"[PoliteRequest] SSL fallback failed for {url}: {e}")
+        except (requests.exceptions.SSLError, urllib3.exceptions.SSLError) as e:
+            logger.warning("TLS verification failed for %s: %s", url, e)
+            return None
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
             if attempt < max_retries:
                 time.sleep(delay)
@@ -365,7 +358,7 @@ def fetch_data_gov_datasets(api_key: Optional[str] = None) -> Dict[str, Any]:
     if resp and resp.status_code == 200:
         try:
             payload = resp.json()
-            source_info["status"] = "live_verified"
+            source_info["status"] = "reachable"
             source_info["details"] = f"Live OGD API response received ({payload.get('total', 1)} records)"
             return {"source": source_info, "data": payload}
         except Exception as e:
@@ -403,7 +396,7 @@ def scrape_nsap_official_rules() -> Dict[str, Any]:
         try:
             soup = BeautifulSoup(resp.text, "html.parser")
             page_title = soup.title.string.strip() if soup.title else "NSAP Portal"
-            source_info["status"] = "live_verified"
+            source_info["status"] = "reachable"
             source_info["details"] = f"Live NSAP portal verified: '{page_title}' | Statutory SLA: 30-45 Days"
         except Exception as e:
             source_info["details"] += f" (HTML parse warning: {e})"
@@ -438,7 +431,7 @@ def scrape_myscheme_rules() -> Dict[str, Any]:
 
     resp = polite_request(portal_url, timeout=10)
     if resp and resp.status_code == 200:
-        source_info["status"] = "live_verified"
+        source_info["status"] = "reachable"
         source_info["details"] = "Live myScheme portal verified (HTTP 200 OK)"
     else:
         status_code = resp.status_code if resp else "offline/timeout"
@@ -466,7 +459,7 @@ def scrape_nsp_scholarship_rules() -> Dict[str, Any]:
 
     resp = polite_request(portal_url, timeout=10)
     if resp and resp.status_code == 200:
-        source_info["status"] = "live_verified"
+        source_info["status"] = "reachable"
         source_info["details"] = "Live National Scholarship Portal verified (HTTP 200 OK)"
     else:
         status_code = resp.status_code if resp else "offline/timeout"
@@ -493,7 +486,7 @@ def scrape_pmkisan_rules() -> Dict[str, Any]:
 
     resp = polite_request(portal_url, timeout=10)
     if resp and resp.status_code == 200:
-        source_info["status"] = "live_verified"
+        source_info["status"] = "reachable"
         source_info["details"] = "Live PM-KISAN portal verified (HTTP 200 OK)"
     else:
         status_code = resp.status_code if resp else "offline/timeout"
@@ -557,9 +550,11 @@ def compile_live_schemes_dataset() -> Tuple[List[Dict[str, Any]], List[Dict[str,
     for sid, base_data in VERIFIED_SCHEME_MIRRORS.items():
         scheme_entry = dict(base_data)
         scheme_entry["last_synced_at"] = now_dt
-        scheme_entry["last_verified_date"] = now_str
-        scheme_entry["is_live_source"] = True
-        scheme_entry["is_live_data_source"] = True
+        # These are bundled snapshots; checking a portal homepage does not verify
+        # that its current eligibility rules were fetched or parsed.
+        scheme_entry["last_verified_date"] = base_data.get("last_verified_date")
+        scheme_entry["is_live_source"] = False
+        scheme_entry["is_live_data_source"] = False
         # Ensure backward compatibility aliases are present
         scheme_entry["official_source_name"] = scheme_entry["ministry_or_department"]
         scheme_entry["source_gazette_or_guideline_url"] = scheme_entry["official_guidelines_url"]
@@ -618,7 +613,7 @@ def sync_to_database(schemes_data: List[Dict[str, Any]], db: Optional[Session] =
             portal_url = str(s.get("official_portal_url", "")).replace("https://nsap.nic.in", "https://nsap.dord.gov.in")
             guideline_url = str(s.get("official_guidelines_url") or s.get("source_gazette_or_guideline_url", portal_url)).replace("https://nsap.nic.in", "https://nsap.dord.gov.in")
             charter = s.get("citizen_charter_clause", f"Statutory Citizen's Charter Guarantee ({s.get('processing_deadline_days', 30)} Days SLA)")
-            is_live = bool(s.get("is_live_source", s.get("is_live_data_source", True)))
+            is_live = bool(s.get("is_live_source", s.get("is_live_data_source", False)))
             last_ver = s.get("last_verified_date", now_dt.strftime("%d-%b-%Y"))
 
             if not existing:
@@ -713,4 +708,3 @@ if __name__ == "__main__":
         for err in res["errors"]:
             print(f"  ! {err}")
     print("==================================================")
-

@@ -2,11 +2,12 @@ import re
 from difflib import SequenceMatcher
 from typing import Dict, Any, List, Optional, Tuple
 from datetime import datetime
+# pyrefly: ignore[missing-source-for-stubs]
 from dateutil import parser as date_parser
 
 from schemas import DocumentCompareResponse
 
-HONORIFICS = ["smt", "smt.", "shri", "shri.", "kumari", "km.", "mrs", "mr", "dr", "dr."]
+HONORIFICS = ["smt", "smt.", "shri", "shri.", "km.", "mrs", "mr", "dr", "dr."]
 
 
 def clean_name(name: Optional[str]) -> str:
@@ -16,7 +17,7 @@ def clean_name(name: Optional[str]) -> str:
     cleaned = name.lower()
     for h in HONORIFICS:
         cleaned = re.sub(rf"\b{re.escape(h)}\b", "", cleaned)
-    cleaned = re.sub(r"[^a-z\s]", " ", cleaned)
+    cleaned = re.sub(r"[^\w\s]|[\d_]", " ", cleaned, flags=re.UNICODE)
     tokens = [t.strip() for t in cleaned.split() if t.strip()]
     return " ".join(tokens)
 

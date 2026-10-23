@@ -1,6 +1,5 @@
 import logging
 import os
-import traceback
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone, timedelta
 from typing import List, Optional
@@ -14,6 +13,7 @@ from fastapi import (
     File,
     Form,
     Request,
+    Response,
     status,
 )
 from fastapi.encoders import jsonable_encoder
@@ -29,6 +29,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from database import engine, Base, get_db
+import config
+from auth import ensure_citizen_owner, get_current_citizen, issue_access_token
 import models
 from models import Citizen, Scheme, Application, Grievance, DocumentCheck, VoiceInteractionLog, DigiLockerDocument, utc_now
 from schemas import (
@@ -97,25 +99,28 @@ from digilocker_service import (
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Ensure tables, rules, and seed data exist
+    # Startup: create tables. Demo records are only seeded in local development.
     Base.metadata.create_all(bind=engine)
-    try:
-        generate_sample_document_images()
-        seed_database()
-    except Exception as e:
-        print(f"[Startup] Seed database notice: {e}")
+    if not config.IS_SERVERLESS and os.getenv("SEED_DEMO_DATA", "true").lower() == "true":
+        try:
+            generate_sample_document_images()
+            seed_database()
+        except Exception:
+            logging.exception("Local demo data initialization failed")
     yield
     # Shutdown logic if any
 
 
 # Security Configuration for API Documentation
-DOCS_USERNAME = os.getenv("DOCS_USERNAME", "admin")
-DOCS_PASSWORD = os.getenv("DOCS_PASSWORD", "BenefitBridge@2026")
+DOCS_USERNAME = os.getenv("DOCS_USERNAME", "")
+DOCS_PASSWORD = os.getenv("DOCS_PASSWORD", "")
 security = HTTPBasic()
 
 
 def verify_docs_credentials(credentials: HTTPBasicCredentials = Depends(security)):
     """Secures FastAPI documentation endpoints (/docs, /redoc, /openapi.json) with HTTP Basic Authentication."""
+    if not DOCS_USERNAME or not DOCS_PASSWORD:
+        raise HTTPException(status_code=404, detail="API documentation is disabled.")
     correct_username = secrets.compare_digest(credentials.username, DOCS_USERNAME)
     correct_password = secrets.compare_digest(credentials.password, DOCS_PASSWORD)
     if not (correct_username and correct_password):
@@ -125,6 +130,17 @@ def verify_docs_credentials(credentials: HTTPBasicCredentials = Depends(security
             headers={"WWW-Authenticate": "Basic"},
         )
     return credentials.username
+
+
+def verify_admin_access(request: Request) -> bool:
+    """Guard state-changing maintenance/demo operations outside local demo mode."""
+    if config.ENABLE_DEMO_INTEGRATIONS and not config.IS_SERVERLESS:
+        return True
+    expected = os.getenv("ADMIN_API_TOKEN", "")
+    supplied = request.headers.get("authorization", "")
+    if not expected or not supplied.startswith("Bearer ") or not secrets.compare_digest(supplied[7:], expected):
+        raise HTTPException(status_code=401, detail="Admin authorization is required.")
+    return True
 
 
 app = FastAPI(
@@ -145,13 +161,7 @@ app = FastAPI(
 # CORS Middleware for local frontend (e.g. Vite on 5173, Next.js on 3000) and Vercel deployments
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "*"  # Allows hackathon demo and preview deployments
-    ],
+    allow_origins=os.getenv("CORS_ALLOW_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173,http://localhost:8443,http://127.0.0.1:8443,http://localhost:3000,http://127.0.0.1:3000").split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -165,15 +175,16 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     Catches malformed payloads before they crash FastAPI workers.
     Logs full stack trace to the terminal and returns structured JSON 400.
     """
-    tb = traceback.format_exc()
-    print(f"\n[ERROR SHIELD - 400] Validation failed for {request.method} {request.url.path}: {exc}\n{tb}", flush=True)
-    logging.error(f"[Validation Error Shield] {request.method} {request.url.path}: {exc}\n{tb}")
+    logging.warning("Request validation failed for %s %s", request.method, request.url.path)
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content={
             "error": "Bad Request",
             "message": "Invalid request payload format.",
-            "details": jsonable_encoder(exc.errors()),
+            "details": jsonable_encoder([
+                {key: value for key, value in error.items() if key != "input"}
+                for error in exc.errors()
+            ]),
             "path": str(request.url.path),
         },
     )
@@ -185,15 +196,13 @@ async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
     Catches database operational/locking/schema errors safely.
     Logs full stack trace to terminal and returns structured JSON 500 without crashing worker.
     """
-    tb = traceback.format_exc()
-    print(f"\n[ERROR SHIELD - 500] Database error at {request.method} {request.url.path}: {exc}\n{tb}", flush=True)
-    logging.error(f"[Database Error Shield] {request.method} {request.url.path}: {exc}\n{tb}")
+    logging.exception("Database error at %s %s", request.method, request.url.path)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
             "error": "Internal Server Error",
             "message": "A database error occurred while processing the request.",
-            "details": str(exc),
+            "details": "Please try again later.",
             "path": str(request.url.path),
         },
     )
@@ -285,11 +294,18 @@ def register_citizen(citizen_in: CitizenCreate, db: Session = Depends(get_db)):
     db.add(citizen)
     db.commit()
     db.refresh(citizen)
-    return citizen
+    response = CitizenResponse.model_validate(citizen)
+    response.access_token = issue_access_token(citizen.id)
+    return response
 
 
 @app.get("/citizens/{citizen_id}", response_model=CitizenResponse, tags=["Citizens"])
-def get_citizen(citizen_id: str, db: Session = Depends(get_db)):
+def get_citizen(
+    citizen_id: str,
+    db: Session = Depends(get_db),
+    current: Optional[Citizen] = Depends(get_current_citizen),
+):
+    ensure_citizen_owner(citizen_id, current)
     citizen = db.query(Citizen).filter(Citizen.id == citizen_id).first()
     if not citizen:
         raise HTTPException(status_code=404, detail=f"Citizen with ID '{citizen_id}' not found.")
@@ -297,7 +313,7 @@ def get_citizen(citizen_id: str, db: Session = Depends(get_db)):
 
 
 # ---------------- 2 & 3. Schemes ----------------
-@app.post("/schemes/sync-live-data", response_model=LiveSyncResponse, tags=["Schemes"])
+@app.post("/schemes/sync-live-data", response_model=LiveSyncResponse, tags=["Schemes"], dependencies=[Depends(verify_admin_access)])
 def sync_live_government_data(force_refresh: bool = False, db: Session = Depends(get_db)):
     """
     Triggers live ingestion pipeline across official repositories:
@@ -364,14 +380,13 @@ def list_schemes(db: Session = Depends(get_db)):
         last_verified = (
             (getattr(db_record, "last_verified_date", None) if db_record else None)
             or rule_data.get("last_verified_date")
-            or "14-Oct-2026"
         )
         is_live = (
             (getattr(db_record, "is_live_source", None) if db_record else None)
             or (getattr(db_record, "is_live_data_source", None) if db_record else None)
         )
         if is_live is None:
-            is_live = rule_data.get("is_live_source", rule_data.get("is_live_data_source", True))
+            is_live = rule_data.get("is_live_source", rule_data.get("is_live_data_source", False))
 
         summaries.append(
             SchemeSummary(
@@ -454,16 +469,19 @@ def get_scheme_detail(scheme_id: str, db: Session = Depends(get_db)):
     merged.setdefault("state_or_level", "Central")
     merged.setdefault("citizen_charter_clause", f"Statutory Citizen's Charter Guarantee ({merged.get('processing_deadline_days', 30)} Days SLA)")
     merged.setdefault("last_synced_at", utc_now())
-    merged.setdefault("last_verified_date", "14-Oct-2026")
-    merged.setdefault("is_live_source", True)
-    merged.setdefault("is_live_data_source", True)
+    merged.setdefault("last_verified_date", None)
+    merged.setdefault("is_live_source", False)
+    merged.setdefault("is_live_data_source", False)
 
     return SchemeDetail(**merged)
 
 
 # ---------------- 4. Eligibility Rules Engine ----------------
 @app.post("/eligibility/check", response_model=EligibilityCheckResponse, tags=["Eligibility Engine"])
-def check_eligibility(payload: EligibilityCheckRequest):
+def check_eligibility(
+    payload: EligibilityCheckRequest,
+    _current: Optional[Citizen] = Depends(get_current_citizen),
+):
     """
     Evaluates citizen profile against welfare scheme rules deterministically.
     Classifies results into Eligible, Partially Eligible (e.g. missing documents), and Ineligible.
@@ -493,6 +511,7 @@ def check_eligibility(payload: EligibilityCheckRequest):
 @app.post("/documents/scan", response_model=DocumentScanResponse, tags=["Document Doctor"])
 async def scan_document(
     file: UploadFile = File(..., description="Document photo (JPEG, PNG, WebP)"),
+    _current: Optional[Citizen] = Depends(get_current_citizen),
 ):
     """
     Scans a single citizen document image in-memory using pytesseract / OCR.
@@ -500,27 +519,32 @@ async def scan_document(
     Privacy first: Image bytes are processed in memory and discarded; never persisted on disk.
     Never extracts or stores Aadhaar numbers.
     """
-    if not file.content_type.startswith("image/"):
+    if not file.content_type or not file.content_type.startswith("image/"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Uploaded file must be an image. Received MIME type: '{file.content_type}'."
         )
 
     try:
-        content = await file.read()
+        content = await file.read(10 * 1024 * 1024 + 1)
+        if len(content) > 10 * 1024 * 1024:
+            raise HTTPException(status_code=413, detail="Image must be 10 MB or smaller.")
         scan_result = process_document_image(content, filename=file.filename)
         return scan_result
     except ValueError as ve:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"An error occurred while processing the document image: {str(e)}"
+            detail="The image could not be processed. Please try a clearer image."
         )
 
 
 @app.post("/documents/compare", response_model=DocumentCompareResponse, tags=["Document Doctor"])
-def compare_document_fields(payload: DocumentCompareRequest):
+def compare_document_fields(
+    payload: DocumentCompareRequest,
+    _current: Optional[Citizen] = Depends(get_current_citizen),
+):
     """
     Cross-checks extracted fields across two documents (e.g., Ration Card vs Bank Passbook).
     Identifies common Indian spelling variations (Sunita vs Sunitha), DOB format variances,
@@ -538,10 +562,17 @@ def compare_document_fields(payload: DocumentCompareRequest):
 
 # ---------------- 7, 8, 9 & 10. Application Tracker ----------------
 @app.post("/applications", response_model=ApplicationDetailResponse, status_code=status.HTTP_201_CREATED, tags=["Application Tracker"])
-def create_new_application(payload: ApplicationCreateRequest, db: Session = Depends(get_db)):
+def create_new_application(
+    payload: ApplicationCreateRequest,
+    db: Session = Depends(get_db),
+    current: Optional[Citizen] = Depends(get_current_citizen),
+):
     """
     Creates a new tracked application for a selected scheme with calculated resolution deadline.
     """
+    if not payload.consent_given:
+        raise HTTPException(status_code=400, detail="Explicit consent is required before creating an application record.")
+    ensure_citizen_owner(payload.citizen_id, current)
     try:
         app = create_application(db, payload)
         scheme_title = app.scheme.title if app.scheme else app.scheme_id
@@ -563,15 +594,21 @@ def create_new_application(payload: ApplicationCreateRequest, db: Session = Depe
     except ValueError as ve:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ve))
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        logging.exception("Application detail lookup failed")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Could not load application details.")
 
 
 @app.get("/applications/{application_id}", response_model=ApplicationDetailResponse, tags=["Application Tracker"])
-def get_application_detail(application_id: str, db: Session = Depends(get_db)):
+def get_application_detail(
+    application_id: str,
+    db: Session = Depends(get_db),
+    current: Optional[Citizen] = Depends(get_current_citizen),
+):
     """Fetches full details and chronological audit event history for an application."""
     app = db.query(Application).filter(Application.id == application_id).first()
     if not app:
         raise HTTPException(status_code=404, detail=f"Application '{application_id}' not found.")
+    ensure_citizen_owner(app.citizen_id, current)
 
     scheme_title = app.scheme.title if app.scheme else app.scheme_id
     deadline_days = app.scheme.processing_deadline_days if app.scheme else 30
@@ -592,7 +629,11 @@ def get_application_detail(application_id: str, db: Session = Depends(get_db)):
 
 
 @app.get("/applications/{application_id}/status", response_model=CitizenFriendlyStatusResponse, tags=["Application Tracker"])
-def get_application_citizen_status(application_id: str, db: Session = Depends(get_db)):
+def get_application_citizen_status(
+    application_id: str,
+    db: Session = Depends(get_db),
+    current: Optional[Citizen] = Depends(get_current_citizen),
+):
     """
     Returns simplified, citizen-friendly status information, days remaining / days overdue,
     and whether the application is eligible for grievance escalation.
@@ -600,6 +641,7 @@ def get_application_citizen_status(application_id: str, db: Session = Depends(ge
     app = db.query(Application).filter(Application.id == application_id).first()
     if not app:
         raise HTTPException(status_code=404, detail=f"Application '{application_id}' not found.")
+    ensure_citizen_owner(app.citizen_id, current)
     return get_citizen_friendly_status(app)
 
 
@@ -607,7 +649,8 @@ def get_application_citizen_status(application_id: str, db: Session = Depends(ge
 def mock_department_status_update(
     application_id: str,
     payload: MockStatusUpdateRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _admin: bool = Depends(verify_admin_access),
 ):
     """
     Mock department status-update endpoint for demo and live test purposes.
@@ -637,13 +680,21 @@ def mock_department_status_update(
 
 # ---------------- 11 & 12. Grievance Escalator ----------------
 @app.post("/grievances/draft", response_model=GrievanceDraftResponse, tags=["Grievance Escalator"])
-def create_grievance_draft(payload: GrievanceDraftRequest, db: Session = Depends(get_db)):
+def create_grievance_draft(
+    payload: GrievanceDraftRequest,
+    db: Session = Depends(get_db),
+    current: Optional[Citizen] = Depends(get_current_citizen),
+):
     """
     Generates a formal, respectful, and authoritative grievance draft
     when an application has crossed its expected resolution date.
     Does NOT auto-submit to government portals. Provides suggested submission portals.
     """
     try:
+        application = db.query(Application).filter(Application.id == payload.application_id).first()
+        if application is None:
+            raise HTTPException(status_code=404, detail="Application not found.")
+        ensure_citizen_owner(application.citizen_id, current)
         draft_response = generate_grievance_draft(
             db,
             application_id=payload.application_id,
@@ -653,15 +704,22 @@ def create_grievance_draft(payload: GrievanceDraftRequest, db: Session = Depends
     except ValueError as ve:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ve))
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        logging.exception("Grievance draft creation failed")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Could not create grievance draft.")
 
 
 @app.get("/grievances/{grievance_id}", tags=["Grievance Escalator"])
-def get_grievance(grievance_id: int, db: Session = Depends(get_db)):
+def get_grievance(
+    grievance_id: int,
+    db: Session = Depends(get_db),
+    current: Optional[Citizen] = Depends(get_current_citizen),
+):
     """Retrieves a previously generated grievance draft record."""
     grievance = db.query(Grievance).filter(Grievance.id == grievance_id).first()
     if not grievance:
         raise HTTPException(status_code=404, detail=f"Grievance with ID {grievance_id} not found.")
+    if grievance.application:
+        ensure_citizen_owner(grievance.application.citizen_id, current)
 
     app = grievance.application
     scheme_title = app.scheme.title if app and app.scheme else "Welfare Scheme"
@@ -685,13 +743,20 @@ def get_grievance(grievance_id: int, db: Session = Depends(get_db)):
 
 # ---------------- 13. Voice Intake Assistant ----------------
 @app.post("/voice/intake", response_model=VoiceIntakeResponse, tags=["Voice Intake"])
-def process_voice_intake(payload: VoiceIntakeRequest, db: Session = Depends(get_db)):
+def process_voice_intake(
+    payload: VoiceIntakeRequest,
+    db: Session = Depends(get_db),
+    current: Optional[Citizen] = Depends(get_current_citizen),
+):
     """
     Bilingual speech intake assistant for Indian welfare applications.
     Extracts demographic, economic, and scheme intent data from speech-to-text transcripts.
     Strictly redacts 12-digit national identity numbers (Aadhaar).
     Persists audit log in voice_interaction_logs.
     """
+    ensure_citizen_owner(payload.citizen_id, current)
+    if not payload.consent_given:
+        raise HTTPException(status_code=400, detail="Explicit consent is required before saving voice intake data.")
     extraction = extract_intake_from_speech(payload.raw_transcript)
     safe_transcript = sanitize_speech_transcript(payload.raw_transcript)
     audio_lang = payload.audio_language or f"{extraction['language_detected']}-IN"
@@ -715,8 +780,14 @@ def process_voice_intake(payload: VoiceIntakeRequest, db: Session = Depends(get_
 
 
 @app.get("/voice/logs", response_model=List[VoiceInteractionLogResponse], tags=["Voice Intake"])
-def list_voice_logs(citizen_id: Optional[str] = None, db: Session = Depends(get_db)):
+def list_voice_logs(
+    citizen_id: Optional[str] = None,
+    db: Session = Depends(get_db),
+    current: Optional[Citizen] = Depends(get_current_citizen),
+):
     """Retrieves stored voice interaction logs with privacy sanitization."""
+    if current is not None:
+        citizen_id = current.id
     q = db.query(VoiceInteractionLog)
     if citizen_id:
         q = q.filter(VoiceInteractionLog.citizen_id == citizen_id)
@@ -727,6 +798,7 @@ def list_voice_logs(citizen_id: Optional[str] = None, db: Session = Depends(get_
 async def voice_apply_scheme(
     audio_file: UploadFile = File(..., description="Multipart audio file recording"),
     preferred_language: str = Form("auto", description="Preferred language code or 'auto'"),
+    consent_given: bool = Form(True),
     db: Session = Depends(get_db),
 ):
     """
@@ -748,6 +820,9 @@ async def voice_apply_scheme(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Empty audio file received. Please provide a valid speech recording."
             )
+
+        if not consent_given:
+            raise HTTPException(status_code=400, detail="Confirm consent before processing voice data and creating an application.")
 
         try:
             transcript = transcribe_audio_bytes(
@@ -876,7 +951,9 @@ async def voice_apply_scheme(
             application_id=application.id,
             scheme_id=target_scheme_id,
             status="submitted",
-            confirmation_message=confirmation_message
+            confirmation_message=confirmation_message,
+            citizen_id=citizen.id,
+            access_token=issue_access_token(citizen.id),
         )
 
     except HTTPException:
@@ -916,66 +993,116 @@ async def voice_apply_scheme(
 )
 async def digilocker_login(
     request: Request,
+    response: Response,
     format: Optional[str] = None,
     target_scheme_id: str = "widow_pension"
 ):
-    csrf_token = uuid.uuid4().hex
+    if not get_scheme_by_id(target_scheme_id):
+        raise HTTPException(status_code=404, detail="Unknown scheme.")
+    if not config.ENABLE_DEMO_INTEGRATIONS and (
+        config.DIGILOCKER_CLIENT_ID == "BB_DEMO_CLIENT_ID" or not config.DIGILOCKER_CLIENT_SECRET
+    ):
+        raise HTTPException(status_code=503, detail="DigiLocker is not configured.")
+    csrf_token = secrets.token_urlsafe(32)
     state_token = f"{csrf_token}:{target_scheme_id}"
     auth_url = get_authorization_url(state=csrf_token, target_scheme_id=target_scheme_id)
 
+    def set_state_cookie(target: Response) -> None:
+        target.set_cookie(
+            config.OAUTH_STATE_COOKIE,
+            state_token,
+            max_age=600,
+            httponly=True,
+            secure=request.url.scheme == "https",
+            samesite="lax",
+            path="/auth/digilocker/callback",
+        )
+
     accept_header = request.headers.get("accept", "")
     if format == "json" or "application/json" in accept_header:
+        set_state_cookie(response)
         return DigiLockerLoginResponse(
             auth_url=auth_url,
             state=state_token
         )
 
-    return RedirectResponse(url=auth_url, status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+    redirect = RedirectResponse(url=auth_url, status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+    set_state_cookie(redirect)
+    return redirect
 
 
 @app.get(
     "/auth/digilocker/callback",
     summary="DigiLocker / API Setu OAuth 2.0 Authorization Callback",
     description=(
-        "Processes the OAuth authorization code returned by Meri Pehchaan / DigiLocker. "
-        "Exchanges code for access token, fetches digitally signed credentials from issuing departments, "
-        "scrubs any national identity numbers (Aadhaar), upserts citizen identity, "
-        "executes deterministic rules evaluation, and automatically creates a tracked application with statutory SLA guarantees."
+        "Processes the OAuth authorization code returned by Meri Pehchaan / DigiLocker, "
+        "retrieves available credentials, and reports a preliminary deterministic eligibility assessment. "
+        "It does not create or submit a welfare application."
     ),
     tags=["DigiLocker Integration", "DigiLocker & API Setu"],
     response_model=DigiLockerCallbackResponse
 )
 async def digilocker_callback(
+    request: Request,
+    response: Response,
     code: str,
     state: str,
     target_scheme_id: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
-    # 1. Parse target scheme from state or query parameter
-    resolved_scheme = target_scheme_id
-    if not resolved_scheme and ":" in state:
-        _, state_scheme = state.split(":", 1)
-        resolved_scheme = state_scheme.strip()
-    if not resolved_scheme:
+    # Local demo callbacks or sandbox/mock codes
+    is_demo_request = code.startswith("sandbox_") or code.startswith("mock_") or state.startswith("demo:")
+    if is_demo_request:
+        if not config.ENABLE_DEMO_INTEGRATIONS:
+            raise HTTPException(status_code=404, detail="Demo integration is disabled.")
+        if ":" in state:
+            resolved_scheme = state.split(":", 1)[1].strip()
+        else:
+            resolved_scheme = target_scheme_id or "widow_pension"
+    else:
+        stored_state = request.cookies.get(config.OAUTH_STATE_COOKIE, "")
+        if stored_state:
+            if not secrets.compare_digest(stored_state, state):
+                raise HTTPException(status_code=400, detail="OAuth state validation failed. Restart sign-in.")
+            response.delete_cookie(config.OAUTH_STATE_COOKIE, path="/auth/digilocker/callback")
+        if ":" in state:
+            try:
+                _, resolved_scheme = state.split(":", 1)
+                resolved_scheme = resolved_scheme.strip()
+            except ValueError:
+                resolved_scheme = target_scheme_id or "widow_pension"
+        else:
+            resolved_scheme = target_scheme_id or "widow_pension"
+
+    if target_scheme_id and get_scheme_by_id(target_scheme_id):
+        resolved_scheme = target_scheme_id
+    elif not get_scheme_by_id(resolved_scheme):
         resolved_scheme = "widow_pension"
 
     try:
         # 2. Exchange authorization code for access token
         token_data = await exchange_code_for_token(code=code)
-        access_token = token_data.get("access_token", "mock_token_123")
+        demo_mode = bool(token_data.get("_demo_mode", False))
+        access_token = token_data.get("access_token")
+        if not access_token:
+            raise HTTPException(status_code=502, detail="Identity provider returned no access token.")
         expires_in = token_data.get("expires_in", 3600)
         dl_id = token_data.get("digilockerid") or f"DL-{uuid.uuid4().hex[:8].upper()}"
-        full_name = token_data.get("name", "Sunita Devi")
-        dob = token_data.get("dob", "12/04/1959")
-        raw_gender = token_data.get("gender", "F")
+        full_name = token_data.get("name")
+        dob = token_data.get("dob")
+        raw_gender = token_data.get("gender")
 
         # Normalize gender
         if str(raw_gender).upper().startswith("F"):
             gender = "female"
         elif str(raw_gender).upper().startswith("M"):
             gender = "male"
-        else:
+        elif raw_gender:
             gender = "other"
+        else:
+            gender = None
+        if not full_name:
+            raise HTTPException(status_code=502, detail="Identity provider returned no verified name.")
 
         expiry_dt = datetime.now(timezone.utc) + timedelta(seconds=expires_in)
 
@@ -993,8 +1120,10 @@ async def digilocker_callback(
 
         citizen.digilocker_id = dl_id
         citizen.full_name = full_name
-        citizen.dob = dob
-        citizen.gender = gender
+        if dob:
+            citizen.dob = dob
+        if gender:
+            citizen.gender = gender
         citizen.consent_given = True
         citizen.is_digilocker_verified = True
         citizen.digilocker_token_expiry = expiry_dt
@@ -1003,8 +1132,6 @@ async def digilocker_callback(
         computed_age = calculate_age_from_dob(dob)
         if computed_age is not None:
             citizen.age = computed_age
-        elif citizen.age is None:
-            citizen.age = 65
 
         db.flush()
 
@@ -1159,7 +1286,9 @@ async def digilocker_callback(
             fetched_documents_count=len(saved_items),
             status_message=status_message,
             eligible_schemes_count=len(eligible_schemes) + len(partially_eligible),
-            documents=saved_items
+            documents=saved_items,
+            demo_mode=demo_mode,
+            access_token=issue_access_token(citizen.id),
         )
 
 
@@ -1170,13 +1299,17 @@ async def digilocker_callback(
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Database error during DigiLocker callback processing: {str(sqle)}"
+            detail="DigiLocker callback could not be saved. Please try again later."
         )
+    except RuntimeError:
+        db.rollback()
+        raise HTTPException(status_code=503, detail="DigiLocker verification is currently unavailable.")
     except Exception as e:
         db.rollback()
+        logging.exception("DigiLocker callback processing failed")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"DigiLocker callback processing failed: {str(e)}"
+            detail="DigiLocker callback processing failed. Please try again later."
         )
 
 
@@ -1189,8 +1322,10 @@ async def digilocker_callback(
 )
 def get_citizen_digilocker_documents(
     citizen_id: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current: Optional[Citizen] = Depends(get_current_citizen),
 ):
+    ensure_citizen_owner(citizen_id, current)
     citizen = db.query(Citizen).filter(Citizen.id == citizen_id).first()
     if not citizen:
         raise HTTPException(

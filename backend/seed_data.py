@@ -122,7 +122,7 @@ def seed_database():
             guideline_url = str(data.get("source_gazette_or_guideline_url", portal_url)).replace("https://nsap.nic.in", "https://nsap.dord.gov.in")
             ministry = data.get("ministry_or_department") or data.get("official_source_name", "Official Government Authority")
             state_lvl = data.get("state_or_level", "Central")
-            is_live = bool(data.get("is_live_source", data.get("is_live_data_source", True)))
+            is_live = bool(data.get("is_live_source", data.get("is_live_data_source", False)))
 
             existing = db.query(Scheme).filter(Scheme.scheme_id == scheme_id).first()
             if not existing:
@@ -141,7 +141,7 @@ def seed_database():
                     # Backward compatibility fields
                     official_source_name=ministry,
                     source_gazette_or_guideline_url=guideline_url,
-                    last_verified_date=data.get("last_verified_date", "14-Oct-2026"),
+                    last_verified_date=data.get("last_verified_date"),
                     is_live_data_source=is_live
                 )
                 db.add(scheme)
@@ -160,7 +160,7 @@ def seed_database():
                 # Backward compatibility fields
                 existing.official_source_name = ministry
                 existing.source_gazette_or_guideline_url = guideline_url
-                existing.last_verified_date = data.get("last_verified_date", existing.last_verified_date or "14-Oct-2026")
+                existing.last_verified_date = data.get("last_verified_date")
                 existing.is_live_data_source = is_live
 
         db.commit()

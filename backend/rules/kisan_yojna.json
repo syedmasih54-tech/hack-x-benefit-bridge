@@ -1,56 +1,56 @@
 {
-  "scheme_id": "kisan_yojna",
-  "title": "Pradhan Mantri Kisan Samman Nidhi (PM-KISAN Yojna)",
-  "description": "Income support scheme providing ₹6,000 per year in three equal installments to farmer families with cultivable landholding.",
-  "state_or_level": "Central Sector Scheme, Ministry of Agriculture & Farmers Welfare",
-  "ministry_or_department": "Department of Agriculture & Farmers Welfare, Ministry of Agriculture & Farmers Welfare, Govt of India",
-  "processing_deadline_days": 30,
-  "official_portal_url": "https://pmkisan.gov.in",
-  "official_guidelines_url": "https://pmkisan.gov.in/Documents/RevisedPMKisanGuidelines.pdf",
-  "citizen_charter_clause": "PM-KISAN Operational Guidelines Clause 8.1 & Citizen's Charter on Public Service Guarantees (Statutory SLA: 30 days)",
-  "rule_version": "v2.4.0",
-  "source_reference": "Pradhan Mantri Kisan Samman Nidhi Operational Guidelines, Ministry of Agriculture & Farmers Welfare, Govt of India",
-  "eligibility_rules": {
-    "min_age": 18,
-    "max_age": 120,
-    "gender": [
-      "all"
-    ],
-    "marital_status": [
-      "all"
-    ],
-    "income_limit": 400000,
-    "occupation": [
-      "farmer"
-    ],
-    "disability_status": "any",
-    "required_documents": [
-      "land_records_khatauni",
-      "bank_passbook",
-      "ration_card"
-    ]
-  },
-  "documents_required": [
-    {
-      "code": "land_records_khatauni",
-      "name": "Land Ownership Record (Khatauni / Khasra / RoR)",
-      "mandatory": true
-    },
-    {
-      "code": "bank_passbook",
-      "name": "Bank Passbook with Active DBT Account",
-      "mandatory": true
-    },
-    {
-      "code": "ration_card",
-      "name": "Ration Card / Family ID",
-      "mandatory": false
-    }
-  ],
-  "last_synced_at": "2026-10-14T05:22:02.397836+00:00",
-  "last_verified_date": "14-Oct-2026",
-  "is_live_source": true,
-  "is_live_data_source": true,
-  "official_source_name": "Department of Agriculture & Farmers Welfare, Ministry of Agriculture & Farmers Welfare, Govt of India",
-  "source_gazette_or_guideline_url": "https://pmkisan.gov.in/Documents/RevisedPMKisanGuidelines.pdf"
+    "scheme_id":  "kisan_yojna",
+    "title":  "Pradhan Mantri Kisan Samman Nidhi (PM-KISAN Yojna)",
+    "description":  "Income support scheme providing â‚¹6,000 per year in three equal installments to farmer families with cultivable landholding.",
+    "state_or_level":  "Central Sector Scheme, Ministry of Agriculture \u0026 Farmers Welfare",
+    "ministry_or_department":  "Department of Agriculture \u0026 Farmers Welfare, Ministry of Agriculture \u0026 Farmers Welfare, Govt of India",
+    "processing_deadline_days":  30,
+    "official_portal_url":  "https://pmkisan.gov.in",
+    "official_guidelines_url":  "https://pmkisan.gov.in/Documents/RevisedPMKisanGuidelines.pdf",
+    "citizen_charter_clause":  "PM-KISAN Operational Guidelines Clause 8.1 \u0026 Citizen\u0027s Charter on Public Service Guarantees (Statutory SLA: 30 days)",
+    "rule_version":  "v2.4.0",
+    "source_reference":  "Pradhan Mantri Kisan Samman Nidhi Operational Guidelines, Ministry of Agriculture \u0026 Farmers Welfare, Govt of India",
+    "eligibility_rules":  {
+                              "min_age":  18,
+                              "max_age":  120,
+                              "gender":  [
+                                             "all"
+                                         ],
+                              "marital_status":  [
+                                                     "all"
+                                                 ],
+                              "income_limit":  400000,
+                              "occupation":  [
+                                                 "farmer"
+                                             ],
+                              "disability_status":  "any",
+                              "required_documents":  [
+                                                         "land_records_khatauni",
+                                                         "bank_passbook",
+                                                         "ration_card"
+                                                     ]
+                          },
+    "documents_required":  [
+                               {
+                                   "code":  "land_records_khatauni",
+                                   "name":  "Land Ownership Record (Khatauni / Khasra / RoR)",
+                                   "mandatory":  true
+                               },
+                               {
+                                   "code":  "bank_passbook",
+                                   "name":  "Bank Passbook with Active DBT Account",
+                                   "mandatory":  true
+                               },
+                               {
+                                   "code":  "ration_card",
+                                   "name":  "Ration Card / Family ID",
+                                   "mandatory":  false
+                               }
+                           ],
+    "last_synced_at":  "2026-10-14T05:22:02.397836+00:00",
+    "last_verified_date":  null,
+    "is_live_source":  false,
+    "is_live_data_source":  false,
+    "official_source_name":  "Department of Agriculture \u0026 Farmers Welfare, Ministry of Agriculture \u0026 Farmers Welfare, Govt of India",
+    "source_gazette_or_guideline_url":  "https://pmkisan.gov.in/Documents/RevisedPMKisanGuidelines.pdf"
 }

@@ -58,6 +58,7 @@ def run_migration(target_url: str, update_env: bool = True):
     pg_url = normalize_supabase_url(target_url)
     engine_kwargs = {"pool_pre_ping": True}
     if "sslmode=" not in pg_url:
+        # pyrefly: ignore[bad-assignment]
         engine_kwargs["connect_args"] = {"sslmode": "require"}
 
     print("\n[1/5] Connecting to Supabase PostgreSQL...")

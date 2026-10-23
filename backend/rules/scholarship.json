@@ -1,62 +1,62 @@
 {
-  "scheme_id": "scholarship",
-  "title": "Post-Matric Scholarship for SC/ST/OBC Students",
-  "description": "Centrally sponsored scholarship to support education expenses for post-matriculation or secondary stage students.",
-  "state_or_level": "Central / State Ministry of Social Justice & Empowerment",
-  "ministry_or_department": "Ministry of Social Justice & Empowerment, Govt of India / National Scholarship Portal (NSP)",
-  "processing_deadline_days": 60,
-  "official_portal_url": "https://scholarships.gov.in",
-  "official_guidelines_url": "https://scholarships.gov.in/public/schemeGuidelines/Post_Matric_Scholarship_Guidelines.pdf",
-  "citizen_charter_clause": "Mandated under National Scholarship Portal Citizen's Charter, Para 3.2 & DBT Service Rules (Statutory SLA: 60 days)",
-  "rule_version": "v3.0.2",
-  "source_reference": "National Scholarship Portal Guidelines, Ministry of Social Justice and Empowerment, Govt of India",
-  "eligibility_rules": {
-    "min_age": 16,
-    "max_age": 35,
-    "gender": [
-      "all"
-    ],
-    "marital_status": [
-      "all"
-    ],
-    "income_limit": 250000,
-    "occupation": [
-      "student"
-    ],
-    "disability_status": "any",
-    "required_documents": [
-      "bonafide_student_certificate",
-      "previous_year_marksheet",
-      "income_certificate",
-      "bank_passbook"
-    ]
-  },
-  "documents_required": [
-    {
-      "code": "bonafide_student_certificate",
-      "name": "Bonafide Student Certificate issued by Institution",
-      "mandatory": true
-    },
-    {
-      "code": "previous_year_marksheet",
-      "name": "Previous Qualifying Examination Marksheet",
-      "mandatory": true
-    },
-    {
-      "code": "income_certificate",
-      "name": "Income Certificate issued by Competent Authority",
-      "mandatory": true
-    },
-    {
-      "code": "bank_passbook",
-      "name": "Bank Passbook in Student's Name",
-      "mandatory": true
-    }
-  ],
-  "last_synced_at": "2026-10-14T05:22:02.397836+00:00",
-  "last_verified_date": "14-Oct-2026",
-  "is_live_source": true,
-  "is_live_data_source": true,
-  "official_source_name": "Ministry of Social Justice & Empowerment, Govt of India / National Scholarship Portal (NSP)",
-  "source_gazette_or_guideline_url": "https://scholarships.gov.in/public/schemeGuidelines/Post_Matric_Scholarship_Guidelines.pdf"
+    "scheme_id":  "scholarship",
+    "title":  "Post-Matric Scholarship for SC/ST/OBC Students",
+    "description":  "Centrally sponsored scholarship to support education expenses for post-matriculation or secondary stage students.",
+    "state_or_level":  "Central / State Ministry of Social Justice \u0026 Empowerment",
+    "ministry_or_department":  "Ministry of Social Justice \u0026 Empowerment, Govt of India / National Scholarship Portal (NSP)",
+    "processing_deadline_days":  60,
+    "official_portal_url":  "https://scholarships.gov.in",
+    "official_guidelines_url":  "https://scholarships.gov.in/public/schemeGuidelines/Post_Matric_Scholarship_Guidelines.pdf",
+    "citizen_charter_clause":  "Mandated under National Scholarship Portal Citizen\u0027s Charter, Para 3.2 \u0026 DBT Service Rules (Statutory SLA: 60 days)",
+    "rule_version":  "v3.0.2",
+    "source_reference":  "National Scholarship Portal Guidelines, Ministry of Social Justice and Empowerment, Govt of India",
+    "eligibility_rules":  {
+                              "min_age":  16,
+                              "max_age":  35,
+                              "gender":  [
+                                             "all"
+                                         ],
+                              "marital_status":  [
+                                                     "all"
+                                                 ],
+                              "income_limit":  250000,
+                              "occupation":  [
+                                                 "student"
+                                             ],
+                              "disability_status":  "any",
+                              "required_documents":  [
+                                                         "bonafide_student_certificate",
+                                                         "previous_year_marksheet",
+                                                         "income_certificate",
+                                                         "bank_passbook"
+                                                     ]
+                          },
+    "documents_required":  [
+                               {
+                                   "code":  "bonafide_student_certificate",
+                                   "name":  "Bonafide Student Certificate issued by Institution",
+                                   "mandatory":  true
+                               },
+                               {
+                                   "code":  "previous_year_marksheet",
+                                   "name":  "Previous Qualifying Examination Marksheet",
+                                   "mandatory":  true
+                               },
+                               {
+                                   "code":  "income_certificate",
+                                   "name":  "Income Certificate issued by Competent Authority",
+                                   "mandatory":  true
+                               },
+                               {
+                                   "code":  "bank_passbook",
+                                   "name":  "Bank Passbook in Student\u0027s Name",
+                                   "mandatory":  true
+                               }
+                           ],
+    "last_synced_at":  "2026-10-14T05:22:02.397836+00:00",
+    "last_verified_date":  null,
+    "is_live_source":  false,
+    "is_live_data_source":  false,
+    "official_source_name":  "Ministry of Social Justice \u0026 Empowerment, Govt of India / National Scholarship Portal (NSP)",
+    "source_gazette_or_guideline_url":  "https://scholarships.gov.in/public/schemeGuidelines/Post_Matric_Scholarship_Guidelines.pdf"
 }

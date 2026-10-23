@@ -175,6 +175,8 @@ def process_document_image(image_bytes: bytes, filename: Optional[str] = None) -
     """
     try:
         image = Image.open(io.BytesIO(image_bytes))
+        if image.width * image.height > 30_000_000:
+            raise ValueError("Image dimensions are too large. Please use an image below 30 megapixels.")
         # Convert image to RGB if needed
         if image.mode not in ("RGB", "L"):
             image = image.convert("RGB")
@@ -191,43 +193,14 @@ def process_document_image(image_bytes: bytes, filename: Optional[str] = None) -
         except Exception as e:
             print(f"[OCRService] Pytesseract execution warning: {e}. Falling back to image text recovery.")
 
-    # Synthetic / heuristic text fallback if tesseract binary is unavailable in the environment
-    # or produced empty text from a synthetic test image
-    if not raw_text.strip():
-        # Check filename or embedded metadata to support seamless demo testing
-        fname_lower = (filename or "").lower()
-        if "ration" in fname_lower:
-            raw_text = (
-                "GOVERNMENT OF NATIONAL CAPITAL TERRITORY OF DELHI\n"
-                "DEPARTMENT OF FOOD SUPPLIES AND CONSUMER AFFAIRS\n"
-                "RATION CARD (NFSA / BPL)\n"
-                "Card Holder Name: Sunita Devi\n"
-                "DOB: 12/04/1959\n"
-                "Card No: 0710-4492-9102\n"
-                "Head of Household: Sunita Devi\n"
-            )
-        elif "bank" in fname_lower or "passbook" in fname_lower:
-            raw_text = (
-                "STATE BANK OF INDIA\n"
-                "SAVINGS BANK PASSBOOK\n"
-                "Account Holder Name: Sunitha Devi\n"
-                "Account No: 30981240981\n"
-                "IFSC Code: SBIN0001234\n"
-                "Branch: Main Road Branch\n"
-                "Date of Issue: 15/08/2021\n"
-            )
-        else:
-            raw_text = (
-                "OFFICIAL WELFARE DOCUMENTATION\n"
-                "Beneficiary Name: Sunita Devi\n"
-                "DOB: 12/04/1959\n"
-                "Reference No: 491029410\n"
-            )
-
     sanitized_text = sanitize_text_for_privacy(raw_text)
     doc_type = detect_document_type(sanitized_text)
     extracted, warnings = extract_fields_from_text(sanitized_text, doc_type)
     confidence, indicator, manual_req = calculate_ocr_confidence(ocr_data, sanitized_text)
+
+    if not sanitized_text.strip():
+        warnings.append("No text could be read. Confirm that OCR is installed or upload a clearer image.")
+        manual_req = True
 
     if manual_req and "Low OCR confidence: manual verification required" not in warnings:
         warnings.append("Low OCR confidence: image quality or lighting may be low. Manual verification required.")

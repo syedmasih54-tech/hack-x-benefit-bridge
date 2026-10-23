@@ -83,9 +83,8 @@ async def exchange_code_for_token(code: str) -> Dict[str, Any]:
       {"access_token": "mock_token_123", "digilockerid": "DL-981240182", "name": "Sunita Devi", "dob": "12/04/1959", "gender": "F"}
     """
     is_demo_mode = (
-        config.DIGILOCKER_CLIENT_ID == "BB_DEMO_CLIENT_ID"
-        or code.startswith("demo")
-        or code in ("sandbox_code", "sandbox_demo", "mock_code")
+        config.ENABLE_DEMO_INTEGRATIONS
+        and (code.startswith("sandbox_") or code.startswith("demo") or code in ("mock_code",))
     )
 
     if not is_demo_mode:
@@ -106,15 +105,23 @@ async def exchange_code_for_token(code: str) -> Dict[str, Any]:
                     },
                 )
                 if resp.status_code == 200:
-                    return resp.json()
+                    token_data = resp.json()
+                    token_data["_demo_mode"] = False
+                    return token_data
                 logger.warning(
-                    f"DigiLocker token exchange returned HTTP {resp.status_code}: {resp.text}. Falling back to sandbox."
+                    "DigiLocker token exchange returned HTTP %s.", resp.status_code
                 )
         except Exception as e:
-            logger.warning(f"DigiLocker token exchange network exception: {e}. Falling back to sandbox.")
+            logger.warning("DigiLocker token exchange failed: %s", e)
+
+        raise RuntimeError("DigiLocker token exchange failed")
+
+    if not config.ENABLE_DEMO_INTEGRATIONS:
+        raise RuntimeError("DigiLocker demo mode is disabled")
 
     # Dual-Mode Sandbox: Authentic profile for Indian Welfare Demonstration
     return {
+        "_demo_mode": True,
         "access_token": "mock_token_123",
         "token_type": "Bearer",
         "expires_in": 3600,
@@ -134,10 +141,12 @@ async def fetch_issued_documents(token: str = "mock_token_123") -> List[Dict[str
     'Annual Income Certificate' from Govt of NCT Delhi.
     """
     is_demo_token = (
+        config.ENABLE_DEMO_INTEGRATIONS and (
         config.DIGILOCKER_CLIENT_ID == "BB_DEMO_CLIENT_ID"
         or token.startswith("mock_")
         or token.startswith("dl_token_")
         or "demo" in token.lower()
+        )
     )
 
     if not is_demo_token:
@@ -157,7 +166,12 @@ async def fetch_issued_documents(token: str = "mock_token_123") -> List[Dict[str
                     if items:
                         return items
         except Exception as e:
-            logger.warning(f"Error fetching live DigiLocker issued documents: {e}. Falling back to sandbox.")
+            logger.warning("Fetching DigiLocker documents failed: %s", e)
+
+        raise RuntimeError("DigiLocker document retrieval failed")
+
+    if not config.ENABLE_DEMO_INTEGRATIONS:
+        raise RuntimeError("DigiLocker demo mode is disabled")
 
     # Sandbox: Authentic schemas for 'Ration Card (NFSA)' and 'Annual Income Certificate' from Govt of NCT Delhi
     ration_xml = """<?xml version="1.0" encoding="UTF-8"?>
@@ -371,7 +385,7 @@ async def parse_document_payload(doc_item: Dict[str, Any], access_token: str = "
         "category": meta.get("category", "General"),
         "validity": meta.get("validity", "Valid"),
         "raw_issuer": issuer_name,
-        "digital_signature": "SHA256_RSA_DIGILOCKER_VERIFIED",
+        "verification_note": "Retrieved through the configured DigiLocker endpoint; cryptographic signature verification is not performed by this service.",
     }
 
     return {

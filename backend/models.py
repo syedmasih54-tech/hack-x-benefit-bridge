@@ -89,13 +89,13 @@ class Scheme(Base):
     citizen_charter_clause = Column(String(255), nullable=True)  # e.g., "Right to Public Services Act, Sec 4"
     official_guidelines_url = Column(String(512), nullable=True)  # Official Gazette or Operational Guidelines PDF/URL
     last_synced_at = Column(DateTime, default=utc_now, nullable=False)
-    is_live_source = Column(Boolean, default=True, nullable=False)
+    is_live_source = Column(Boolean, default=False, nullable=False)
 
     # Backward compatibility columns / aliases for existing codebase & database
     official_source_name = Column(String(255), nullable=True)
     source_gazette_or_guideline_url = Column(String(512), nullable=True)
     last_verified_date = Column(String(32), nullable=True)
-    is_live_data_source = Column(Boolean, default=True, nullable=True)
+    is_live_data_source = Column(Boolean, default=False, nullable=True)
 
     applications = relationship("Application", back_populates="scheme")
 

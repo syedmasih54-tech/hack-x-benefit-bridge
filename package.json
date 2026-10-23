@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test src/lib/*.test.ts",
     "preview": "vite preview",
     "format": "oxfmt src vite.config.ts"
   },

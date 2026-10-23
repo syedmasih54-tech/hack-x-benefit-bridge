@@ -234,14 +234,13 @@ uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 ### 3. Frontend Setup (React / Vite)
 
 ```bash
-# In a separate terminal, navigate to the frontend directory
-cd frontend
+# From the project root (the frontend is in this directory)
 
 # Install dependencies
 npm install
 
 # Start the Vite development server on port 5173
-npm run dev -- --port 5173 --host 127.0.0.1
+npm run dev -- --host 127.0.0.1
 ```
 
 * **Citizen Portal Frontend**: [http://127.0.0.1:5173/](http://127.0.0.1:5173/)

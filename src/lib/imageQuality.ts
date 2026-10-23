@@ -4,12 +4,17 @@ export async function checkImageQuality(file: File) {
     bitmap.close()
     return "छवि बहुत छोटी है। कृपया पास से दोबारा लें।"
   }
+
   const canvas = document.createElement("canvas")
   const size = 120
   canvas.width = size
   canvas.height = size
   const context = canvas.getContext("2d", { willReadFrequently: true })
-  if (!context) return null
+  if (!context) {
+    bitmap.close()
+    return null
+  }
+
   context.drawImage(bitmap, 0, 0, size, size)
   bitmap.close()
   const { data } = context.getImageData(0, 0, size, size)

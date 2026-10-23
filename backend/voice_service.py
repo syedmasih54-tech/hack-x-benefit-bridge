@@ -68,7 +68,7 @@ def detect_language(text: str) -> str:
     return "hi" if len(matches) >= 1 else "en"
 
 
-def extract_age(text: str) -> int:
+def extract_age(text: str) -> Optional[int]:
     """Extracts citizen age as integer from numerals or spoken words."""
     t = text.lower()
 
@@ -175,8 +175,8 @@ def extract_annual_income(text: str) -> float:
                 except ValueError:
                     pass
 
-    # Match raw standalone number e.g. "120000"
-    if amt == 0.0:
+    # Bare amounts require income context to avoid mistaking age or phone digits.
+    if amt == 0.0 and re.search(r"\b(?:income|aamdani|kamai|salary|saalana|annual|rupees?|rs)\b", t):
         m = re.search(r"\b([0-9]{3,8})\b", t)
         if m:
             try:

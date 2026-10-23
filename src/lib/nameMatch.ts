@@ -1,12 +1,4 @@
-const honorifics = new Set([
-  "devi",
-  "kumari",
-  "smt",
-  "srimati",
-  "श्रीमती",
-  "कुमारी",
-  "देवी",
-])
+const honorifics = new Set(["smt", "srimati", "श्रीमती"])
 
 const devanagariWords: Record<string, string> = {
   सुनीता: "sunita",
